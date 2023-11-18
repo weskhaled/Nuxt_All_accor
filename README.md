@@ -4,7 +4,7 @@
 
 <p align="center">
 <br>
-<a href="https://all.accor.vercel.app/">🖥 Online Preview</a>
+<a href="https://allaccor.vercel.app/">🖥 Online Preview</a>
 <br><br>
 
 ## Features
