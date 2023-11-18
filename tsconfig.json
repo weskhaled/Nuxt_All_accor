@@ -1,0 +1,13 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "types/*": ["./@types", "@typesgoogle.maps", "@googlemaps/markerclusterer"]
+    },
+    "typeRoots": [
+      "./@types",
+      "node_modules/@types"
+    ]
+  }
+}
