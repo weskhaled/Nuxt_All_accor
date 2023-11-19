@@ -36,28 +36,24 @@ export const pwa: ModuleOptions = {
     ],
   },
   workbox: {
-    globPatterns: ['**/*.{js,css,html,txt,png,ico,svg}'],
+    globPatterns: ['**/*.{js,ts,css,scss,less,png,webp,svg,mp4,vue,ico}'],
     // navigateFallbackDenylist: [/^\/api\//],
-    navigateFallbackDenylist: [/^\/api\//, /^\/search\//],
+    navigateFallbackDenylist: [/^\/api\//, /^\/search?\//],
     navigateFallback: '/',
     cleanupOutdatedCaches: true,
+    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
     runtimeCaching: [
       {
-        handler: 'NetworkFirst',
-        urlPattern: ({ url }) => {
-          return url.pathname.startsWith('/search') ? ['search', url.pathname] : false
-        },
+        urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.match(/^\/search?\/.*/i),
+        handler: 'NetworkOnly',
         options: {
-          cacheName: 'search-cache',
-          cacheableResponse: {
-            statuses: [200], // only 200 status code will be cached
-          },
-          expiration: {
-            maxEntries: 10, // max 10 entries will be cached
+          matchOptions: {
+            ignoreVary: true,
+            ignoreSearch: true,
           },
           plugins: [{
-            // when offline and /hi/<name> missing from cache, the sw will fail, fallback to /
-            handlerDidError: async () => Response.redirect('/search', 302),
+            handlerDidError: async () => Response.redirect('/error', 302),
+            cacheWillUpdate: async () => null,
           }],
         },
       },
