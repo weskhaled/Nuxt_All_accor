@@ -10,12 +10,12 @@ definePageMeta({
 const { dayjs } = useDayjs()
 const mapRef = ref<HTMLElement | null>()
 const { googleMapsApi, gMapsInstance, googleMapsCoreApi, MarkerClusterer, mapTools } = useGoogleMaps(mapRef)
-const { coords } = useGeolocation()
+// const { coords } = useGeolocation()
 
 const nightsRouteQuery = useRouteQuery('nights')
+const showHotelRoomsRouteQuery: any = useRouteQuery('showHotelRooms', null)
 const destinationRouteQuery = useRouteQuery('destination')
 const selectedHotelIdRouteQuery = useRouteQuery('selectedHotelId')
-// const dateRouteQuery = useRouteQuery('date', `["${dayjs().format('YYYY-MM-DD')}", "${dayjs().format('YYYY-MM-DD')}"]`, { transform: val => JSON.parse(val) })
 const dateFromRouteQuery = useRouteQuery('dateFrom', dayjs().format('YYYY-MM-DD'))
 const dateToRouteQuery = useRouteQuery('dateTo', dayjs().add(5, 'day').format('YYYY-MM-DD'))
 const compositionsRouteQuery = useRouteQuery('compositions', '{}', { transform: value => JSON.parse(decodeURIComponent(value)) })
@@ -303,6 +303,7 @@ watchDebounced(
     () => filters.destination,
     () => filters.date[0],
     () => filters.date[1],
+    () => showHotelDetails.value,
   ],
   () => {
     if (filters.destination && filters.date[0] && filters.date[1]) {
@@ -312,13 +313,15 @@ watchDebounced(
       dateToRouteQuery.value = dayjs(filters.date[1]).format('YYYY-MM-DD')
       const nights = dayjs(filters.date[1]).diff(filters.date[0], 'day') + 1
       nightsRouteQuery.value = `${nights}`
+      showHotelRoomsRouteQuery.value = showHotelDetails.value ? 'true' : null
+
       // compositionsRouteQuery.value = `{}`
     }
   },
   { debounce: 100, maxWait: 1000 },
 )
 onMounted(() => {
-  if (selectedHotelIdRouteQuery.value)
+  if (showHotelRoomsRouteQuery.value)
     showHotelDetails.value = true
 })
 </script>
@@ -332,7 +335,7 @@ onMounted(() => {
         <!-- list hotels -->
         <div :class="[selectedHotelForDetails && showHotelDetails && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']" class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200">
           <!-- overlay -->
-          <div v-if="isMounted && selectedHotelForDetails && showHotelDetails" class="fixed right-0 top-0 z-5 h-screen w-full bg-light/50 transition-all duration-400 dark:bg-black/70" @click="() => showHotelDetails = false" />
+          <div v-if="isMounted && selectedHotelForDetails && showHotelDetails" class="fixed right-0 top-0 z-5 h-screen w-full bg-light/50 backdrop-blur-1px transition-all duration-400 dark:bg-black/70" @click="() => showHotelDetails = false" />
           <div v-bind="containerProps" :class="[selectedHotelForDetails && showHotelDetails ? '!overflow-hidden' : 'overflow-auto']" class="my-scrollbar relative z-4 h-full w-full flex flex-col">
             <div
               :class="[(!showHotelsListHeader && y > 125 && lastScrollInContainerList === 'down') ? 'top--20' : 'top-0 ']"

@@ -131,11 +131,18 @@ const handle = ref<HTMLElement | null>(null)
           </a-sub-menu>
         </a-menu>
       </div>
-      <div class="mb-5 flex flex-col items-center space-y-4 [&_.arco-btn>.arco-btn-icon>span]:text-dark dark:[&_.arco-btn>.arco-btn-icon>span]:text-light">
+      <div class="mb-10 flex flex-col items-center space-y-4 [&_.arco-btn>.arco-btn-icon>span]:text-dark dark:[&_.arco-btn>.arco-btn-icon>span]:text-light">
         <a-tooltip content="Mon compte et mes points" position="tr" mini>
           <a-button shape="circle" class="" type="text">
             <template #icon>
               <span class="i-carbon-user-avatar block h-5 w-5 text-sm" />
+            </template>
+          </a-button>
+        </a-tooltip>
+        <a-tooltip content="Setting" position="tr" mini>
+          <a-button shape="circle" class="" type="text">
+            <template #icon>
+              <span class="i-carbon-settings block h-5 w-5 text-sm" />
             </template>
           </a-button>
         </a-tooltip>

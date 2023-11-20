@@ -22,14 +22,14 @@ const hotelStars = computed(() => modelValue && hotelDetails ? (+toValue(hotelDe
 const loadingGetRooms = ref(true)
 const errorGetRooms: any = ref(null)
 const rooms: any = ref([])
-const selectedTarif: any = ref(null)
+const selectedTariff: any = ref(null)
 
 useAsyncData(
   async () => {
     if (!hotelDetails.value || !hotelDetails.value.offers?.length || !modelValue.value)
       return
 
-    selectedTarif.value = null
+    selectedTariff.value = null
     loadingGetRooms.value = true
     errorGetRooms.value = null
     rooms.value = []
@@ -39,11 +39,12 @@ useAsyncData(
     const adults = hotelDetails.value.offers[0].effectiveOccupancy?.adults
     const childrenAges = hotelDetails.value.offers[0].effectiveOccupancy?.childrenAge
     return await useFetch(`/api/hotels/${hotelId}/rooms?adults=${adults}&dateIn=${dateIn}&nights=${nights}&childrenAges=${childrenAges}`).then(({ data, error }) => {
-      if (data.value)
+      if (data.value) {
         rooms.value = data.value?.data
+        selectedTariff.value = `${rooms.value[0]?.code}_${rooms.value[0]?.offers[0]?.code}`
+      }
 
-      else if (error.value)
-        errorGetRooms.value = error.value
+      else if (error.value) { errorGetRooms.value = error.value }
 
       loadingGetRooms.value = false
     })
@@ -66,10 +67,10 @@ const hotelSliders = computed(() => {
   })) || []
 })
 const selectedRoomOffer = computed(() => {
-  if (!selectedTarif.value)
+  if (!selectedTariff.value)
     return null
 
-  const parsedValue = selectedTarif.value.split('_')
+  const parsedValue = selectedTariff.value.split('_')
   const roomId = parsedValue[0]
   const offreId = parsedValue[1]
   if (roomId && offreId) {
@@ -247,10 +248,10 @@ const selectedRoomOffer = computed(() => {
           <div class="flex overflow-hidden lg:flex-row lg:pr-2">
             <div class="w-full flex flex-1">
               <div v-if="rooms && !loadingGetRooms && !errorGetRooms" class="w-full flex flex-col space-y-2">
-                <div v-for="room in rooms" :key="room.code" :class="[selectedRoomOffer?.roomCode === room.code ? 'border-blue-3 dark:border-blue-7 dark:bg-gray-8 bg-white' : 'border-gray-2 dark:border-gray-7 dark:bg-gray-8/65 bg-white/65']" class="border rounded-sm p-1 shadow-sm">
+                <div v-for="(room, index) in rooms" :key="room.code" :class="[selectedRoomOffer?.roomCode === room.code ? 'border-blue-3 dark:border-blue-7 dark:bg-gray-8 bg-white' : 'border-gray-2 dark:border-gray-7 dark:bg-gray-8/65 bg-white/65']" class="border rounded-sm p-1 shadow-sm">
                   <div class="min-h-35 flex flex-col overflow-hidden xl:flex-row">
                     <img class="mr-2 h-full max-h-35 w-full rounded-2px object-cover md:h-auto xl:w-48" :src="`https://www.ahstatic.com/photos/${hotelDetails?.hotel?.id.toLowerCase()}_ro${room.code.toLowerCase()}_00_p_346x260.jpg`" alt="">
-                    <div class="h-full w-full flex flex-col justify-between">
+                    <div class="h-auto w-full flex flex-col justify-between">
                       <div class="">
                         <h5 class="my-1 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
                           {{ room.roomClass?.label }}
@@ -276,41 +277,47 @@ const selectedRoomOffer = computed(() => {
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <h3 class="md:text-md my-4 flex items-center gap-3 font-semibold after:h-px before:h-px after:flex-1 before:flex-1 after:bg-zinc-3/20 before:bg-zinc-3/20 after:content-[''] before:content-['']">
-                      CHOISIR LE TARIF DE VOTRE CHAMBRE
-                    </h3>
-                    <div class="pb-1">
-                      <a-radio-group v-model="selectedTarif" class="w-full flex flex-col space-y-2">
-                        <template v-for="item in room.offers" :key="item.code">
-                          <a-radio class="w-full !mr-0" :value="`${room.code}_${item.code}`">
-                            <template #radio="{ checked }">
-                              <div
-                                class="custom-radio-card flex items-start"
-                                :class="{ 'custom-radio-card-checked': checked }"
-                              >
-                                <div class="custom-radio-card-mask">
-                                  <div class="custom-radio-card-mask-dot" />
-                                </div>
-                                <div class="ml-2 w-full">
-                                  <div class="custom-radio-card-title">
-                                    {{ item?.label }}
-                                  </div>
-                                  <a-typography-text type="secondary">
-                                    {{ item?.description }}
-                                  </a-typography-text>
-                                  <div text-right>
-                                    <span class="text-lg font-light text-gray-900 lg:text-xl dark:text-white">
-                                      {{ (item?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: item?.pricing?.currency || 'EUR' }) }}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </template>
-                          </a-radio>
+                  <div class="mt-2">
+                    <a-collapse :default-active-key="[`0_${room.code}`]" :bordered="false">
+                      <a-collapse-item :key="`${index}_${room.code}`" class="![&_.arco-collapse-item-content]:px-2">
+                        <template #header>
+                          <h4 class="font-semibold">
+                            CHOISIR LE TARIF DE VOTRE CHAMBRE
+                          </h4>
                         </template>
-                      </a-radio-group>
-                    </div>
+                        <div class="">
+                          <a-radio-group v-model="selectedTariff" class="w-full flex flex-col space-y-2">
+                            <template v-for="item in room.offers" :key="item.code">
+                              <a-radio class="w-full !mr-0 !pl-0" :value="`${room.code}_${item.code}`">
+                                <template #radio="{ checked }">
+                                  <div
+                                    class="custom-radio-card flex items-start"
+                                    :class="{ 'custom-radio-card-checked': checked }"
+                                  >
+                                    <div class="custom-radio-card-mask">
+                                      <div class="custom-radio-card-mask-dot" />
+                                    </div>
+                                    <div class="ml-2 w-full">
+                                      <div class="custom-radio-card-title">
+                                        {{ item?.label }}
+                                      </div>
+                                      <a-typography-text type="secondary">
+                                        {{ item?.description }}
+                                      </a-typography-text>
+                                      <div text-right>
+                                        <span class="text-lg font-light text-gray-900 lg:text-xl dark:text-white">
+                                          {{ (item?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: item?.pricing?.currency || 'EUR' }) }}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </template>
+                              </a-radio>
+                            </template>
+                          </a-radio-group>
+                        </div>
+                      </a-collapse-item>
+                    </a-collapse>
                   </div>
                 </div>
               </div>
