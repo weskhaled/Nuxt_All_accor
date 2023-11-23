@@ -2,7 +2,7 @@
 import { UseImage } from '@vueuse/components'
 
 interface Props {
-  hotelList?: any
+  hotelList?: any[]
   selectedHotelId?: any
   loadingHotelImages?: string | null
 }
@@ -15,19 +15,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['closeInfoWindow', 'showHotelImagesViewer', 'update:selectedHotelId', 'centerPosition', 'toggleHotelDetails'])
 
 const { hotelList, selectedHotelId } = useVModels(props, emit)
-
-const hotelSliders = computed(() => {
-  if (!hotelDetails.value?.hotel?.media?.medias)
-    return []
-
-  return hotelDetails.value?.hotel?.media?.medias.map(m => ({
-    title: 'Intro',
-    image: {
-      screen: m['1024x768'] || m['2048x1536'],
-      thumb: m['346x260'] || m['120x90'],
-    },
-  }))
-})
 </script>
 
 <template>
@@ -44,7 +31,7 @@ const hotelSliders = computed(() => {
         <a-image
           :preview="false" show-loader class="cover h-full w-full flex cursor-pointer items-center"
           :src="`https://www.ahstatic.com/photos/${item.hotelCode.toLowerCase()}_ho_00_p_346x260.jpg`"
-          @click="$emit('showHotelImagesViewer', item.hotelCode.toLowerCase())"
+          @click="emit('showHotelImagesViewer', item.hotelCode.toLowerCase())"
         />
       </a-spin>
       <div
@@ -90,17 +77,17 @@ const hotelSliders = computed(() => {
                 </a-button>
               </a-tooltip>
               <template #content>
-                <a-doption tabindex="0" @click="$emit('centerPosition', item.hotel)">
+                <a-doption tabindex="0" @click="() => (selectedHotelId = item.hotel?.id, emit('centerPosition', item.hotel))">
                   Sélectionner on maps
                 </a-doption>
                 <a-doption
                   tabindex="1"
                   :disabled="selectedHotelId !== item.hotel?.id"
-                  @click="() => (selectedHotelId === item.hotel?.id && (selectedHotelId = null, $emit('closeInfoWindow')))"
+                  @click="() => (selectedHotelId === item.hotel?.id && (selectedHotelId = null, emit('closeInfoWindow')))"
                 >
                   Désélectionner
                 </a-doption>
-                <a-doption :disabled="item.status !== 'OPEN'" tabindex="0" @click="() => (selectedHotelId = item.hotelCode, $emit('toggleHotelDetails', true), $emit('centerPosition', item.hotel))">
+                <a-doption :disabled="item.status !== 'OPEN'" tabindex="0" @click="() => (selectedHotelId = item.hotel?.id, emit('toggleHotelDetails', true), emit('centerPosition', item.hotel))">
                   Voir les chambres
                 </a-doption>
                 <a-doption>Save</a-doption>

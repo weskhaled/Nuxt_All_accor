@@ -208,7 +208,7 @@ watch(allowTouchMove, (val) => {
     @apply w-full absolute z-2 left-0 bottom-0 bg-black/50;
 
     .swiper-bar {
-      @apply w-0 max-w-full h-4px bg-yellow-4;
+      @apply w-0 max-w-full h-4px bg-blue-6;
     }
   }
 

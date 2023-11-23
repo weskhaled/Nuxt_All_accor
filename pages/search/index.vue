@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { promiseTimeout, useGeolocation, useScroll, useVirtualList, watchDebounced } from '@vueuse/core'
+import { promiseTimeout, until, useGeolocation, useScroll, useVirtualList, watchDebounced } from '@vueuse/core'
 import { useRouteQuery } from '@vueuse/router'
 import { A } from '@mobily/ts-belt'
 
@@ -35,12 +35,12 @@ const optionsPlaces = ref([])
 const loadingPlaces = ref(false)
 const layoutView = ref('MAP')
 const viewInMap = ref(false)
-const showHotelDetails = ref(false)
+// const showHotelDetails = ref(false)
 const visibleDrawer = ref(false)
 const visibleImgViewer = ref(false)
 const loadingHotelImages: Ref<string | null> = ref(null)
 const srcListImgs = ref([])
-// const selectedHotelId = ref(null)
+const selectedHotelId = ref(toValue(selectedHotelIdRouteQuery))
 const showHotelsListHeader = ref(false)
 const filters = reactive({
   sortBy: 'price',
@@ -80,15 +80,15 @@ const filteredItems = computed(() => {
 })
 
 const selectedHotelForDetails = computed(() => {
-  if (!selectedHotelIdRouteQuery.value)
-    return
+  if (!selectedHotelIdRouteQuery.value || !filteredItems.value.length)
+    return null
 
   return filteredItems.value.find(h => h?.hotelCode === selectedHotelIdRouteQuery.value) ?? null
 })
 
 useSeoMeta({
-  title: computed(() => selectedHotelForDetails.value?.hotel?.seo?.title || `All Accor Search ${destinationRouteQuery.value}`),
-  description: computed(() => selectedHotelForDetails.value?.hotel?.seo?.metaDescription || `All Accor Search ${destinationRouteQuery.value}`),
+  title: computed(() => selectedHotelForDetails.value?.hotel?.name || `All Accor Search ${destinationRouteQuery.value}`),
+  description: computed(() => selectedHotelForDetails.value?.hotel?.seoDescription || `All Accor Search ${destinationRouteQuery.value}`),
 })
 
 const selectedHotelIndex = computed(() => {
@@ -273,16 +273,18 @@ async function showHotelImagesViewer(id: string) {
   loadingHotelImages.value = null
 }
 
-function centerPosition(hotel) {
+async function centerPosition(hotel) {
   const { lat, lng } = hotel?.localization?.gps
-  if (!lat || !lng)
+
+  if (!lat || !lng || !googleMapsCoreApi.value || !gMapsInstance.value)
     return
+
   const center = new googleMapsCoreApi.value.LatLng(Number.parseFloat(lat), Number.parseFloat(lng))
   gMapsInstance.value.setCenter(center)
   gMapsInstance.value.setZoom(19)
-  const findedMarker = markers.find(marker => marker.getPosition().lat() === +lat && marker.getPosition().lng() === +lng)
+  const foundedMarker = markers.find(marker => marker.getPosition().lat() === +lat && marker.getPosition().lng() === +lng)
 
-  if (!findedMarker)
+  if (!foundedMarker)
     return
 
   infoWindow.setContent(`
@@ -291,11 +293,10 @@ function centerPosition(hotel) {
     <h3 class="font-semibold text-xs text-gray-6">(+${hotel.contact?.phonePrefix})${hotel.contact?.phone}</h3>
   `)
   infoWindow.open({
-    anchor: findedMarker,
+    anchor: foundedMarker,
     map: gMapsInstance.value,
     shouldFocus: true,
   })
-  selectedHotelIdRouteQuery.value = hotel.id
 }
 
 watchDebounced(
@@ -303,7 +304,6 @@ watchDebounced(
     () => filters.destination,
     () => filters.date[0],
     () => filters.date[1],
-    () => showHotelDetails.value,
   ],
   () => {
     if (filters.destination && filters.date[0] && filters.date[1]) {
@@ -313,16 +313,24 @@ watchDebounced(
       dateToRouteQuery.value = dayjs(filters.date[1]).format('YYYY-MM-DD')
       const nights = dayjs(filters.date[1]).diff(filters.date[0], 'day') + 1
       nightsRouteQuery.value = `${nights}`
-      showHotelRoomsRouteQuery.value = showHotelDetails.value ? 'true' : null
 
       // compositionsRouteQuery.value = `{}`
     }
   },
-  { debounce: 100, maxWait: 1000 },
+  { debounce: 0, maxWait: 1000 },
 )
-onMounted(() => {
-  if (showHotelRoomsRouteQuery.value)
-    showHotelDetails.value = true
+
+onMounted(async () => {
+  await until(googleMapsCoreApi).changed()
+  await until(gMapsInstance).changed()
+  await promiseTimeout(1000)
+  if (selectedHotelForDetails.value) {
+    centerPosition(selectedHotelForDetails.value?.hotel)
+  }
+  else {
+    await until(selectedHotelForDetails).changed()
+    toValue(selectedHotelForDetails)?.hotel && centerPosition(toValue(selectedHotelForDetails)?.hotel)
+  }
 })
 </script>
 
@@ -333,10 +341,10 @@ onMounted(() => {
         class="relative z-4 h-full w-2/2 flex flex-1 overflow-hidden border-bluegray-2 rounded-t-md 2xl:w-4/7 md:w-4/5 xl:w-5/7 xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
       >
         <!-- list hotels -->
-        <div :class="[selectedHotelForDetails && showHotelDetails && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']" class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200">
+        <div :class="[selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']" class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200">
           <!-- overlay -->
-          <div v-if="isMounted && selectedHotelForDetails && showHotelDetails" class="fixed right-0 top-0 z-5 h-screen w-full bg-light/50 backdrop-blur-1px transition-all duration-400 dark:bg-black/70" @click="() => showHotelDetails = false" />
-          <div v-bind="containerProps" :class="[selectedHotelForDetails && showHotelDetails ? '!overflow-hidden' : 'overflow-auto']" class="my-scrollbar relative z-4 h-full w-full flex flex-col">
+          <div v-if="isMounted && selectedHotelForDetails && showHotelRoomsRouteQuery" class="fixed right-0 top-0 z-5 h-screen w-full bg-light/50 backdrop-blur-1px transition-all duration-400 dark:bg-black/70" @click="() => (showHotelRoomsRouteQuery = null, selectedHotelIdRouteQuery = null)" />
+          <div v-bind="containerProps" :class="[selectedHotelForDetails && showHotelRoomsRouteQuery ? '!overflow-hidden' : 'overflow-auto']" class="my-scrollbar relative z-4 h-full w-full flex flex-col">
             <div
               :class="[(!showHotelsListHeader && y > 125 && lastScrollInContainerList === 'down') ? 'top--20' : 'top-0 ']"
               class="content-header sticky z-3 border-b-1px border-bluegray-9/5 bg-light-2/90 p-2 pb-0 shadow-sm backdrop-blur backdrop-filter transition-all-200 delay-0.2s dark:border-bluegray-1/5 dark:bg-dark-9/90"
@@ -430,11 +438,11 @@ onMounted(() => {
                       <a-select
                         v-model="filters.sortBy" :options="keySort" class="w-full flex-1" size="medium"
                         placeholder="Trier par" :bordered="true"
-                        @change="selectedHotelIdRouteQuery = null, scrollTo(0)"
+                        @change="selectedHotelId = null, scrollTo(0)"
                       />
                       <a-button
                         :disabled="!filters.sortBy" type="dashed" size="medium" class="ml-2 flex-none"
-                        @click="() => (filters.sortOrder === 'ASC' ? (filters.sortOrder = 'DESC') : (filters.sortOrder = 'ASC'), selectedHotelIdRouteQuery = null, scrollTo(0))"
+                        @click="() => (filters.sortOrder === 'ASC' ? (filters.sortOrder = 'DESC') : (filters.sortOrder = 'ASC'), selectedHotelId = null, scrollTo(0))"
                       >
                         <i
                           :class="[filters.sortOrder === 'ASC' ? 'i-carbon-sort-ascending' : 'i-carbon-sort-descending']"
@@ -453,7 +461,7 @@ onMounted(() => {
                 <div class="relative w-full flex flex-1 flex-col">
                   <div v-if="isMounted && !loadingGetHotels && !errorGetHotels" v-bind="wrapperProps" class="h-full p-0">
                     <div class="list flex flex-col space-y-5px">
-                      <HotelList v-model:loadingHotelImages="loadingHotelImages" v-model:hotelList="list" v-model:selected-hotel-id="selectedHotelIdRouteQuery" @toggle-hotel-details="(value) => showHotelDetails = value" @center-position="centerPosition" @show-hotel-images-viewer="showHotelImagesViewer" @close-info-window="infoWindow?.close()" />
+                      <HotelList v-model:loadingHotelImages="loadingHotelImages" v-model:hotelList="list" v-model:selectedHotelId="selectedHotelIdRouteQuery" @toggle-hotel-details="(value) => showHotelRoomsRouteQuery = value" @center-position="centerPosition" @show-hotel-images-viewer="showHotelImagesViewer" @close-info-window="(infoWindow?.close(), gMapsInstance.setZoom(11))" />
                     </div>
                   </div>
                   <div v-if="loadingGetHotels && !errorGetHotels" class="top-0 h-full flex items-center justify-center">
@@ -486,13 +494,13 @@ onMounted(() => {
         <!-- hotel details -->
         <div class="my-scrollbar absolute top-0 z-2 h-full w-full flex overflow-auto bg-white/85 dark:bg-black/85">
           <div class="relative h-full w-full p-0 pl-50px">
-            <HotelDetails v-model="showHotelDetails" v-model:hotelDetails="selectedHotelForDetails" @show-hotel-images-viewer="showHotelImagesViewer" />
+            <HotelDetails v-model="showHotelRoomsRouteQuery" v-model:hotelDetails="selectedHotelForDetails" v-model:selectedHotelId="selectedHotelIdRouteQuery" @show-hotel-images-viewer="showHotelImagesViewer" />
           </div>
         </div>
       </div>
       <div
         class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-2 transition-all md:h-full md:p-0"
-        :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelDetails && 'delay-0 !md:w-55']"
+        :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
       >
         <div id="maps" ref="mapRef" class="h-full min-h-full w-full flex border-1px border-stone-4 rounded-md shadow-sm md:border-0 md:rounded-0" />
       </div>

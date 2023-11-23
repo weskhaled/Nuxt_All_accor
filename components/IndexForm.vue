@@ -162,13 +162,19 @@ function handleSubmit({ values, errors }) {
         </a-form-item>
       </div>
       <div class="flex-0">
-        <button
-          html-type="submit"
-          class="right--6 top--6 z-2 ml-auto mt-2 h-8 w-auto flex flex content-center items-center justify-center border border-blue-8/20 rounded-1px bg-blue-6/90 px-3 backdrop-blur transition-all md:absolute md:h-9 active:(border-blue-8 bg-blue-7/80) hover:bg-blue-7/90"
-        >
-          <span class="mr-2 text-4 font-400 text-light-1 md:block">Recherche</span>
-          <span i-carbon-search m-auto block text-sm leading-8 text-white class="icon-shadow" />
-        </button>
+        <div class="mt-2 w-full md:absolute md:right--6 md:top--6 md:w-60">
+          <a-button type="primary" html-type="submit" class="group !h-9 !w-full" size="large">
+            <span class="flex-1 text-4.2 font-500">
+              Recherche
+            </span>
+            <span
+              flex-0 h-full w-20 flex items-center justify-center rounded-r-2px
+              class="ml-2 bg-blue-9/20 px-2 -mr-[calc(1.25rem-1px)]"
+            >
+              <span class="h-5 w-5 transition-all group-hover:scale-115%" i-carbon-search />
+            </span>
+          </a-button>
+        </div>
       </div>
     </a-form>
     <div class="pt-3">

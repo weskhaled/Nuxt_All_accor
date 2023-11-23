@@ -37,13 +37,19 @@ export default defineConfig({
             weights: ['300', '400', '600', '700', '800'],
           },
         ],
-        mono: ['Space Grotesk'],
         // custom ones
         script: [
           {
             name: 'Kaushan Script',
             italic: false,
             weights: ['400'],
+          },
+        ],
+        mono: [
+          {
+            name: 'Space Grotesk',
+            italic: false,
+            weights: ['300', '400', '500'],
           },
         ],
         general: [

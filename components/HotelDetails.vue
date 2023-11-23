@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { promiseTimeout } from '@vueuse/core'
 import { UseImage } from '@vueuse/components'
 
 interface Props {
-  modelValue?: boolean
+  modelValue?: any
   hotelDetails?: any
   selectedHotelId?: any
 }
@@ -12,9 +13,9 @@ const props = withDefaults(defineProps<Props>(), {
   hotelDetails: () => null,
 })
 
-const emit = defineEmits(['back', 'update:modelValue', 'showHotelImagesViewer'])
+const emit = defineEmits(['back', 'update:modelValue', 'showHotelImagesViewer', 'update:selectedHotelId'])
 
-const { modelValue, hotelDetails } = useVModels(props, emit)
+const { modelValue, hotelDetails, selectedHotelId } = useVModels(props, emit)
 // const isMounted = useMounted()
 const isDark = computed(() => useColorMode().value === 'dark')
 const { dayjs } = useDayjs()
@@ -23,6 +24,7 @@ const loadingGetRooms = ref(true)
 const errorGetRooms: any = ref(null)
 const rooms: any = ref([])
 const selectedTariff: any = ref(null)
+const selectedTariffChanged = ref(false)
 
 useAsyncData(
   async () => {
@@ -66,6 +68,7 @@ const hotelSliders = computed(() => {
     },
   })) || []
 })
+
 const selectedRoomOffer = computed(() => {
   if (!selectedTariff.value)
     return null
@@ -80,6 +83,16 @@ const selectedRoomOffer = computed(() => {
     }
   }
 })
+
+watchDebounced(
+  selectedTariff,
+  async () => {
+    selectedTariffChanged.value = true
+    await promiseTimeout(501)
+    selectedTariffChanged.value = false
+  },
+  { debounce: 0, maxWait: 501 },
+)
 </script>
 
 <template>
@@ -92,13 +105,13 @@ const selectedRoomOffer = computed(() => {
           class="m-0 inline-block flex-none !h-6 !w-6 !border-1px !border-blue"
           type="text"
           aria-label="Previous"
-          @click="() => modelValue = false"
+          @click="() => (modelValue = null, selectedHotelId = null)"
         >
           <template #icon>
             <span i-carbon-arrow-left class="" />
           </template>
         </a-button>
-        <h3 class="text-md my-1 flex-1 text-center font-bold md:text-2xl">
+        <h3 class="text-md my-1 flex-1 text-center font-semibold font-chillax md:text-2xl">
           Choisissez votre chambre
         </h3>
       </div>
@@ -110,7 +123,7 @@ const selectedRoomOffer = computed(() => {
             </h1>
           </div>
           <!-- card hotel -->
-          <div class="m-0 mb-2 w-full flex-none lg:sticky lg:top-17.25 lg:float-right lg:mb-0 lg:max-w-sm lg:w-xs xl:w-sm">
+          <div class="[--animate-duration:0.5s] m-0 mb-2 w-full flex-none lg:sticky lg:top-17.25 lg:float-right lg:mb-0 lg:max-w-sm lg:w-xs xl:w-sm">
             <div class="w-full overflow-hidden border border-gray-200 rounded-sm bg-white/75 shadow-sm dark:border-gray-700 dark:bg-gray-8/75">
               <div class="relative">
                 <a-carousel
@@ -170,7 +183,7 @@ const selectedRoomOffer = computed(() => {
               </div>
               <div class="px-3 pb-5">
                 <div>
-                  <h1 class="m-0 my-1 mt-2 text-xl font-bold tracking-tight sm:text-2xl">
+                  <h1 class="m-0 my-1 mt-2 text-xl font-bold tracking-tight font-mono sm:text-2xl">
                     {{ hotelDetails?.hotel?.name }}
                   </h1>
                   <h5 class="my-1 text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
@@ -222,7 +235,7 @@ const selectedRoomOffer = computed(() => {
                       <span class="block text-zinc-5">(frais et taxes inclus)</span>
                     </span>
 
-                    <span class="text-lg font-light text-gray-900 lg:text-3xl dark:text-white">
+                    <span class="text-lg font-light text-gray-900 lg:text-3xl dark:text-white" :class="[selectedTariffChanged && 'animate__animated animate__bounce']">
                       {{ (selectedRoomOffer?.offer?.pricing?.amount?.afterTax || 0).toLocaleString('fr-FR', { style: 'currency', currency: selectedRoomOffer?.offer?.pricing?.currency || 'EUR' }) }}
                     </span>
                   </div>
@@ -277,18 +290,26 @@ const selectedRoomOffer = computed(() => {
                       </div>
                     </div>
                   </div>
-                  <div class="mt-2">
+                  <div class="[--animate-duration:0.3s] mt-2">
                     <a-collapse :default-active-key="[`0_${room.code}`]" :bordered="false">
                       <a-collapse-item :key="`${index}_${room.code}`" class="![&_.arco-collapse-item-content]:px-2">
                         <template #header>
-                          <h4 class="font-semibold">
+                          <h4 class="font-semibold leading-4.2">
                             CHOISIR LE TARIF DE VOTRE CHAMBRE
                           </h4>
+                        </template>
+                        <template v-if="room.offers[0]" #extra>
+                          <h5 class="md:text-md rounded-full bg-indigo-4/10 px-2.5 text-center text-sm font-600 text-gray-900 lg:block dark:bg-indigo-4/10 dark:text-white">
+                            <span class="from-sky-3 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent">From</span>
+                            <span class="ml-1 font-500">
+                              {{ (room.offers[0]?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: room.offers[0]?.pricing?.currency || 'EUR' }) }}
+                            </span>
+                          </h5>
                         </template>
                         <div class="">
                           <a-radio-group v-model="selectedTariff" class="w-full flex flex-col space-y-2">
                             <template v-for="item in room.offers" :key="item.code">
-                              <a-radio class="w-full !mr-0 !pl-0" :value="`${room.code}_${item.code}`">
+                              <a-radio class="w-full !mr-0 !pl-0" :value="`${room.code}_${item.code}`" :class="[selectedTariff === `${room.code}_${item.code}` && 'animate__animated animate__pulse']">
                                 <template #radio="{ checked }">
                                   <div
                                     class="custom-radio-card flex items-start"
