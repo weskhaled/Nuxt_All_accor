@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { promiseTimeout, until, useGeolocation, useScroll, useVirtualList, watchDebounced } from '@vueuse/core'
+import type { UseFuseOptions } from '@vueuse/integrations/useFuse'
+import { useFuse } from '@vueuse/integrations/useFuse'
 import { useRouteQuery } from '@vueuse/router'
 import { A } from '@mobily/ts-belt'
 
@@ -13,6 +15,7 @@ const { googleMapsApi, gMapsInstance, googleMapsCoreApi, MarkerClusterer, mapToo
 // const { coords } = useGeolocation()
 
 const nightsRouteQuery = useRouteQuery('nights')
+const searchHotelInput: any = useRouteQuery('searchHotelInput')
 const showHotelRoomsRouteQuery: any = useRouteQuery('showHotelRooms', null)
 const destinationRouteQuery = useRouteQuery('destination')
 const selectedHotelIdRouteQuery = useRouteQuery('selectedHotelId')
@@ -48,6 +51,7 @@ const filters = reactive({
   destination: destinationRouteQuery.value,
   date: [(dayjs(dateFromRouteQuery.value || dayjs())).format('YYYY-MM-DD'), (dayjs(dateToRouteQuery.value || dayjs())).format('YYYY-MM-DD')],
   showAllResult: true,
+  searchInput: '',
 })
 const errorGetHotels: Ref<any> = ref(null)
 const loadingGetHotels = ref(true)
@@ -73,9 +77,31 @@ function sortHotelsBy(h: any, sortBy: string, order: string) {
   }
 }
 
+const options = computed<UseFuseOptions<any>>(() => ({
+  fuseOptions: {
+    keys: ['hotel.name'],
+    isCaseSensitive: false,
+    includeScore: false,
+    shouldSort: false,
+    includeMatches: false,
+    findAllMatches: false,
+    minMatchCharLength: 3,
+    threshold: 0.1,
+    useExtendedSearch: true,
+  },
+  resultLimit: false,
+  matchAllWhenSearchEmpty: true,
+}))
+
 const filteredItems = computed(() => {
+  let hotels = toValue(availableHotels)
+  if (searchHotelInput.value && searchHotelInput.value?.length > 3)
+    hotels = useFuse(`'${searchHotelInput.value}`, hotels, options).results?.value?.map(i => i.item)
+
+  const sortedAvailableHotels = A.sortBy(hotels, h => sortHotelsBy(h, filters.sortBy, filters.sortOrder))
+
   return filters.showAllResult
-    ? [...A.sortBy(availableHotels.value, h => sortHotelsBy(h, filters.sortBy, filters.sortOrder)), ...unavailableHotels.value]
+    ? [...sortedAvailableHotels, ...unavailableHotels.value]
     : availableHotels.value
 })
 
@@ -320,7 +346,25 @@ watchDebounced(
   { debounce: 0, maxWait: 1000 },
 )
 
+watchDebounced(
+  [
+    () => filters.searchInput,
+  ],
+  async ([searchInputValue]) => {
+    if (searchInputValue && searchInputValue.length > 3)
+      searchHotelInput.value = searchInputValue
+
+    else
+      searchHotelInput.value = null
+
+    await nextTick()
+    scrollTo(0)
+  },
+  { debounce: 300, maxWait: 1000 },
+)
+
 onMounted(async () => {
+  filters.searchInput = searchHotelInput.value
   await until(googleMapsCoreApi).changed()
   await until(gMapsInstance).changed()
   await promiseTimeout(1000)
@@ -349,12 +393,12 @@ onMounted(async () => {
               :class="[(!showHotelsListHeader && y > 125 && lastScrollInContainerList === 'down') ? 'top--20' : 'top-0 ']"
               class="content-header sticky z-3 border-b-1px border-bluegray-9/5 bg-light-2/90 p-2 pb-0 shadow-sm backdrop-blur backdrop-filter transition-all-200 delay-0.2s dark:border-bluegray-1/5 dark:bg-dark-9/90"
             >
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between space-x-2">
                 <h1 class="my-1 inline-block max-w-full flex-1 overflow-hidden truncate text-sm leading-7 md:text-xl">
                   <span class="mr-1">
                     <ClientOnly>
                       <span v-if="loadingGetHotels">
-                        <a-spin />
+                        <a-spin class="h-5 w-5 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-4)" />
                       </span>
                       <span v-else>{{ totalHotels }}</span>
 
@@ -364,12 +408,12 @@ onMounted(async () => {
                     </ClientOnly>
                   </span>
                   <span class="hidden lg:inline-block">Hébergements proches de&nbsp;</span>
-                  <span class="inline-block lg:hidden">&nbsp;Hébergements en&nbsp;</span>
+                  <span class="inline-block lg:hidden">Hébergements /&nbsp;</span>
                   <span class="font-semibold">
                     {{ destinationRouteQuery }}
                   </span>
                 </h1>
-                <div class="flex-0 max-w-80 flex items-center ![--primary:rgb(255_170_255)] md:w-3/8 space-x-1">
+                <div class="flex-0 max-w-65 flex items-center ![--primary:rgb(255_170_255)] md:w-3/8 space-x-1">
                   <a-button size="small" type="primary">
                     Share
                   </a-button>
@@ -408,31 +452,35 @@ onMounted(async () => {
                   </div>
                 </div>
               </div>
-              <div class="z-6 flex justify-between py-2">
-                <div class="flex flex-1 items-center">
+              <div class="z-6 h-14 flex items-center justify-between py-2 space-x-2">
+                <div class="relative h-full flex flex-1 overflow-hidden space-x-2">
                   <h3
-                    class="opacity-100 transition-all delay-0.2s"
+                    class="flex flex-1 items-center overflow-hidden truncate opacity-100 transition-all delay-0.2s"
                     :class="[(y < 125 || lastScrollInContainerList === 'up') && 'invisible opacity-0']"
                   >
-                    <span class="mr-1">
-                      <ClientOnly>
-                        <span v-if="loadingGetHotels">
-                          <a-spin />
-                        </span>
-                        <span v-else>{{ totalHotels }}</span>
-
-                        <template #fallback>
-                          <a-spin />
+                    <ClientOnly>
+                      <span>
+                        <template v-if="loadingGetHotels">
+                          <a-spin class="mr-0.5 h-4 w-4 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-3)" />
                         </template>
-                      </ClientOnly>
-                    </span>
-                    Hébergements en
-                    <span class="font-semibold">
+                        <template v-else>
+                          {{ totalHotels }}
+                        </template>
+                      </span>
+                      <template #fallback>
+                        <a-spin />
+                      </template>
+                    </ClientOnly>
+                    &nbsp;Hébergements /&nbsp;
+                    <span class="truncate font-semibold">
                       {{ destinationRouteQuery }}
                     </span>
                   </h3>
+                  <div class="hidden h-full items-center !w-65 md:flex !2xl:w-122.5">
+                    <a-input-search v-model="filters.searchInput" allow-clear search-button class="w-full" placeholder="Please enter something" />
+                  </div>
                 </div>
-                <div class="max-w-80 md:w-3/8">
+                <div class="max-w-65 md:w-3/8">
                   <div class="w-full w-full flex flex items-center">
                     <div class="w-full flex flex-1 items-center">
                       <a-select
@@ -492,17 +540,17 @@ onMounted(async () => {
           </div>
         </div>
         <!-- hotel details -->
-        <div class="my-scrollbar absolute top-0 z-2 h-full w-full flex overflow-auto bg-white/85 dark:bg-black/85">
+        <div class="my-scrollbar absolute top-0 z-2 h-full w-full flex overflow-auto bg-white/80 dark:bg-black/80">
           <div class="relative h-full w-full p-0 pl-50px">
             <HotelDetails v-model="showHotelRoomsRouteQuery" v-model:hotelDetails="selectedHotelForDetails" v-model:selectedHotelId="selectedHotelIdRouteQuery" @show-hotel-images-viewer="showHotelImagesViewer" />
           </div>
         </div>
       </div>
       <div
-        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-2 transition-all md:h-full md:p-0"
+        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-0 transition-all md:h-full md:p-0"
         :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
       >
-        <div id="maps" ref="mapRef" class="h-full min-h-full w-full flex border-1px border-stone-4 rounded-md shadow-sm md:border-0 md:rounded-0" />
+        <div id="maps" ref="mapRef" class="h-full min-h-full w-full flex shadow-sm lt-md:h-[calc(100%+1.25rem)] md:border-0 md:rounded-0" />
       </div>
     </div>
   </div>

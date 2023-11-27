@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@arco-design/web-vue':
-    specifier: ^2.53.2
-    version: 2.53.2(vue@3.3.8)
+    specifier: ^2.53.3
+    version: 2.53.3(vue@3.3.8)
   '@googlemaps/js-api-loader':
     specifier: ^1.16.2
     version: 1.16.2
@@ -23,6 +23,9 @@ dependencies:
   '@vueuse/components':
     specifier: ^10.6.1
     version: 10.6.1(vue@3.3.8)
+  '@vueuse/integrations':
+    specifier: ^10.6.1
+    version: 10.6.1(fuse.js@7.0.0)(vue@3.3.8)
   '@vueuse/router':
     specifier: ^10.6.1
     version: 10.6.1(vue-router@4.2.5)(vue@3.3.8)
@@ -32,12 +35,15 @@ dependencies:
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
+  fuse.js:
+    specifier: ^7.0.0
+    version: 7.0.0
   ofetch:
     specifier: ^1.3.3
     version: 1.3.3
   swiper:
-    specifier: ^11.0.4
-    version: 11.0.4
+    specifier: ^11.0.5
+    version: 11.0.5
   unocss-preset-scrollbar:
     specifier: ^0.3.0
     version: 0.3.0(unocss@0.57.7)
@@ -80,8 +86,8 @@ devDependencies:
     specifier: ^0.57.7
     version: 0.57.7(postcss@8.4.31)(rollup@2.79.1)(vite@4.5.0)(webpack@5.88.2)
   '@vite-pwa/nuxt':
-    specifier: ^0.2.3
-    version: 0.2.3(@nuxt/kit@3.8.2)(vite-plugin-pwa@0.16.5)
+    specifier: ^0.3.1
+    version: 0.3.1(rollup@2.79.1)(vite@4.5.0)(workbox-build@7.0.0)(workbox-window@7.0.0)
   '@vueuse/nuxt':
     specifier: ^10.6.1
     version: 10.6.1(nuxt@3.8.2)(rollup@2.79.1)(vue@3.3.8)
@@ -200,8 +206,8 @@ packages:
       color: 3.2.1
     dev: false
 
-  /@arco-design/web-vue@2.53.2(vue@3.3.8):
-    resolution: {integrity: sha512-hcrlCkvyjDD9xwWgXLnE48+TEpappP6e8TSLSrlmD9xVQNes4uZIBs+xR90zAUDHOyCokRrJsY1kG+OsZU+FSg==}
+  /@arco-design/web-vue@2.53.3(vue@3.3.8):
+    resolution: {integrity: sha512-/9tMP2GrcGWPGcfRQcLMFMxRBm7s6jjFkCpXXnOpvMAIMe80+gzqjVS2dmgCv2a1FpvB9fy5ot7+evJ5zrsQiw==}
     peerDependencies:
       vue: ^3.1.0
     dependencies:
@@ -4044,16 +4050,19 @@ packages:
       - supports-color
     dev: true
 
-  /@vite-pwa/nuxt@0.2.3(@nuxt/kit@3.8.2)(vite-plugin-pwa@0.16.5):
-    resolution: {integrity: sha512-dAf7crzDth3/hXQ/JAcO0vh9alFl6gUZ3Sw2so1wL4W4VZOMYIA8D3sMo5AH8zV+loUlkqsb6kutmz8IKdpjmQ==}
-    peerDependencies:
-      '@nuxt/kit': ^3.6.2
-      vite-plugin-pwa: '>=0.16.5 <1'
+  /@vite-pwa/nuxt@0.3.1(rollup@2.79.1)(vite@4.5.0)(workbox-build@7.0.0)(workbox-window@7.0.0):
+    resolution: {integrity: sha512-OomQ7jbvC0LoCBEvyQJj5taEVO3PXBYe813NEJLgRvdBuEs70yMJpeKMYE1aYgAo3Z2GDdFZIqDE6fqGiEG4zA==}
     dependencies:
       '@nuxt/kit': 3.8.2(rollup@2.79.1)
       pathe: 1.1.1
-      ufo: 1.3.1
-      vite-plugin-pwa: 0.16.5(vite@4.5.0)(workbox-build@7.0.0)(workbox-window@7.0.0)
+      ufo: 1.3.2
+      vite-plugin-pwa: 0.17.0(vite@4.5.0)(workbox-build@7.0.0)(workbox-window@7.0.0)
+    transitivePeerDependencies:
+      - rollup
+      - supports-color
+      - vite
+      - workbox-build
+      - workbox-window
     dev: true
 
   /@vitejs/plugin-vue-jsx@3.1.0(vite@4.5.0)(vue@3.3.8):
@@ -4319,6 +4328,56 @@ packages:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  /@vueuse/integrations@10.6.1(fuse.js@7.0.0)(vue@3.3.8):
+    resolution: {integrity: sha512-mPDupuofMJ4DPmtX/FfP1MajmWRzYDv8WSaTCo8LQ5kFznjWgmUQ16ApjYqgMquqffNY6+IRMdMgosLDRZOSZA==}
+    peerDependencies:
+      async-validator: '*'
+      axios: '*'
+      change-case: '*'
+      drauu: '*'
+      focus-trap: '*'
+      fuse.js: '*'
+      idb-keyval: '*'
+      jwt-decode: '*'
+      nprogress: '*'
+      qrcode: '*'
+      sortablejs: '*'
+      universal-cookie: '*'
+    peerDependenciesMeta:
+      async-validator:
+        optional: true
+      axios:
+        optional: true
+      change-case:
+        optional: true
+      drauu:
+        optional: true
+      focus-trap:
+        optional: true
+      fuse.js:
+        optional: true
+      idb-keyval:
+        optional: true
+      jwt-decode:
+        optional: true
+      nprogress:
+        optional: true
+      qrcode:
+        optional: true
+      sortablejs:
+        optional: true
+      universal-cookie:
+        optional: true
+    dependencies:
+      '@vueuse/core': 10.6.1(vue@3.3.8)
+      '@vueuse/shared': 10.6.1(vue@3.3.8)
+      fuse.js: 7.0.0
+      vue-demi: 0.14.6(vue@3.3.8)
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
+    dev: false
 
   /@vueuse/metadata@10.6.1:
     resolution: {integrity: sha512-qhdwPI65Bgcj23e5lpGfQsxcy0bMjCAsUGoXkJ7DsoeDUdasbZ2DBa4dinFCOER3lF4gwUv+UD2AlA11zdzMFw==}
@@ -6541,6 +6600,11 @@ packages:
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /fuse.js@7.0.0:
+    resolution: {integrity: sha512-14F4hBIxqKvD4Zz/XjDc3y94mNZN6pRv3U13Udo0lNLCWRBUsrMv2xwcF/y/Z5sV6+FQW+/ow68cHpm4sunt8Q==}
+    engines: {node: '>=10'}
+    dev: false
 
   /gauge@3.0.2:
     resolution: {integrity: sha512-+5J6MS/5XksCuXq++uFRsnUd7Ovu1XenbeuIuNRJxYWjgQbPuFhT14lAvsWfqfAmnwluf1OwMjz39HjfLPci0Q==}
@@ -10081,8 +10145,8 @@ packages:
       picocolors: 1.0.0
     dev: true
 
-  /swiper@11.0.4:
-    resolution: {integrity: sha512-qtUxILrD4aD++rpKzGrkz3IAWL92f9uTrDwjb6HaNLmPvJhZCE/83DL+9w4kIgDDJeF6QKalV47rMBN77UOVYQ==}
+  /swiper@11.0.5:
+    resolution: {integrity: sha512-rhCwupqSyRnWrtNzWzemnBLMoyYuoDgGgspAm/8iBD3jCvAWycPLH4Z3TB0O5520DHLzMx94yUMH/B9Efpa48w==}
     engines: {node: '>= 4.7.0'}
     dev: false
 
@@ -10925,11 +10989,11 @@ packages:
       - supports-color
     dev: true
 
-  /vite-plugin-pwa@0.16.5(vite@4.5.0)(workbox-build@7.0.0)(workbox-window@7.0.0):
-    resolution: {integrity: sha512-Ahol4dwhMP2UHPQXkllSlXbihOaDFnvBIDPmAxoSZ1EObBUJGP4CMRyCyAVkIHjd6/H+//vH0DM2ON+XxHr81g==}
+  /vite-plugin-pwa@0.17.0(vite@4.5.0)(workbox-build@7.0.0)(workbox-window@7.0.0):
+    resolution: {integrity: sha512-cOyEG8EEc7JHmyMapTnjK2j0g2BIC3ErlmOHyGzVu8hqjyF9Jt6yWMmVNFtpA6v/NNyzP28ARf3vwzIAzR1kaw==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
-      vite: ^3.1.0 || ^4.0.0
+      vite: ^3.1.0 || ^4.0.0 || ^5.0.0
       workbox-build: ^7.0.0
       workbox-window: ^7.0.0
     dependencies:
