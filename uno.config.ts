@@ -30,7 +30,8 @@ export default defineConfig({
         sans: [
           {
             // name: 'Figtree',
-            name: 'Montserrat',
+            // name: 'Montserrat',
+            name: 'Plus Jakarta Sans',
             // name: 'DM Sans',
             // name: 'Work Sans',
             italic: true,

@@ -86,7 +86,7 @@ const options = computed<UseFuseOptions<any>>(() => ({
     includeMatches: false,
     findAllMatches: false,
     minMatchCharLength: 3,
-    threshold: 0.1,
+    threshold: 0,
     useExtendedSearch: true,
   },
   resultLimit: false,
@@ -94,7 +94,7 @@ const options = computed<UseFuseOptions<any>>(() => ({
 }))
 
 const filteredItems = computed(() => {
-  let hotels = toValue(availableHotels)
+  let hotels: any = toValue(availableHotels)
   if (searchHotelInput.value && searchHotelInput.value?.length > 3)
     hotels = useFuse(`'${searchHotelInput.value}`, hotels, options).results?.value?.map(i => i.item)
 
@@ -385,10 +385,21 @@ onMounted(async () => {
         class="relative z-4 h-full w-2/2 flex flex-1 overflow-hidden border-bluegray-2 rounded-t-md 2xl:w-4/7 md:w-4/5 xl:w-5/7 xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
       >
         <!-- list hotels -->
-        <div :class="[selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']" class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200">
+        <div
+          :class="[selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']"
+          class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200"
+        >
           <!-- overlay -->
-          <div v-if="isMounted && selectedHotelForDetails && showHotelRoomsRouteQuery" class="fixed right-0 top-0 z-5 h-screen w-full bg-light/50 backdrop-blur-1px transition-all duration-400 dark:bg-black/70" @click="() => (showHotelRoomsRouteQuery = null, selectedHotelIdRouteQuery = null)" />
-          <div v-bind="containerProps" :class="[selectedHotelForDetails && showHotelRoomsRouteQuery ? '!overflow-hidden' : 'overflow-auto']" class="my-scrollbar relative z-4 h-full w-full flex flex-col">
+          <div
+            v-if="isMounted && selectedHotelForDetails && showHotelRoomsRouteQuery"
+            class="fixed right-0 top-0 z-5 h-screen w-full bg-light/50 backdrop-blur-1px transition-all duration-400 dark:bg-black/70"
+            @click="() => (showHotelRoomsRouteQuery = null, selectedHotelIdRouteQuery = null)"
+          />
+          <div
+            v-bind="containerProps"
+            :class="[selectedHotelForDetails && showHotelRoomsRouteQuery ? '!overflow-hidden' : 'overflow-auto']"
+            class="my-scrollbar relative z-4 h-full w-full flex flex-col"
+          >
             <div
               :class="[(!showHotelsListHeader && y > 125 && lastScrollInContainerList === 'down') ? 'top--20' : 'top-0 ']"
               class="content-header sticky z-3 border-b-1px border-bluegray-9/5 bg-light-2/90 p-2 pb-0 shadow-sm backdrop-blur backdrop-filter transition-all-200 delay-0.2s dark:border-bluegray-1/5 dark:bg-dark-9/90"
@@ -398,7 +409,9 @@ onMounted(async () => {
                   <span class="mr-1">
                     <ClientOnly>
                       <span v-if="loadingGetHotels">
-                        <a-spin class="h-5 w-5 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-4)" />
+                        <a-spin
+                          class="h-5 w-5 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-4)"
+                        />
                       </span>
                       <span v-else>{{ totalHotels }}</span>
 
@@ -429,8 +442,9 @@ onMounted(async () => {
                 <div class="flex items-center space-x-2">
                   <div class="max-w-70 flex-1">
                     <a-select
-                      v-model="filters.destination" class="w-full" :loading="loadingPlaces" :options="optionsPlaces"
-                      placeholder="Please select ..." allow-search @search="handleSearchPlaces"
+                      v-model="filters.destination" class="w-full" :loading="loadingPlaces"
+                      :options="optionsPlaces" placeholder="Please select ..." allow-search
+                      @search="handleSearchPlaces"
                     />
                   </div>
                   <div class="flex-1">
@@ -461,7 +475,9 @@ onMounted(async () => {
                     <ClientOnly>
                       <span>
                         <template v-if="loadingGetHotels">
-                          <a-spin class="mr-0.5 h-4 w-4 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-3)" />
+                          <a-spin
+                            class="mr-0.5 h-4 w-4 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-3)"
+                          />
                         </template>
                         <template v-else>
                           {{ totalHotels }}
@@ -477,7 +493,10 @@ onMounted(async () => {
                     </span>
                   </h3>
                   <div class="hidden h-full items-center !w-65 md:flex !2xl:w-122.5">
-                    <a-input-search v-model="filters.searchInput" allow-clear search-button class="w-full" placeholder="Please enter something" />
+                    <a-input-search
+                      v-model="filters.searchInput" allow-clear search-button class="w-full"
+                      placeholder="Please enter something"
+                    />
                   </div>
                 </div>
                 <div class="max-w-65 md:w-3/8">
@@ -485,8 +504,7 @@ onMounted(async () => {
                     <div class="w-full flex flex-1 items-center">
                       <a-select
                         v-model="filters.sortBy" :options="keySort" class="w-full flex-1" size="medium"
-                        placeholder="Trier par" :bordered="true"
-                        @change="selectedHotelId = null, scrollTo(0)"
+                        placeholder="Trier par" :bordered="true" @change="selectedHotelId = null, scrollTo(0)"
                       />
                       <a-button
                         :disabled="!filters.sortBy" type="dashed" size="medium" class="ml-2 flex-none"
@@ -509,7 +527,13 @@ onMounted(async () => {
                 <div class="relative w-full flex flex-1 flex-col">
                   <div v-if="isMounted && !loadingGetHotels && !errorGetHotels" v-bind="wrapperProps" class="h-full p-0">
                     <div class="list flex flex-col space-y-5px">
-                      <HotelList v-model:loadingHotelImages="loadingHotelImages" v-model:hotelList="list" v-model:selectedHotelId="selectedHotelIdRouteQuery" @toggle-hotel-details="(value) => showHotelRoomsRouteQuery = value" @center-position="centerPosition" @show-hotel-images-viewer="showHotelImagesViewer" @close-info-window="(infoWindow?.close(), gMapsInstance.setZoom(11))" />
+                      <HotelList
+                        v-model:loadingHotelImages="loadingHotelImages" v-model:hotelList="list"
+                        v-model:selectedHotelId="selectedHotelIdRouteQuery"
+                        @toggle-hotel-details="(value) => showHotelRoomsRouteQuery = value"
+                        @center-position="centerPosition" @show-hotel-images-viewer="showHotelImagesViewer"
+                        @close-info-window="(infoWindow?.close(), gMapsInstance.setZoom(11))"
+                      />
                     </div>
                   </div>
                   <div v-if="loadingGetHotels && !errorGetHotels" class="top-0 h-full flex items-center justify-center">
@@ -542,7 +566,10 @@ onMounted(async () => {
         <!-- hotel details -->
         <div class="my-scrollbar absolute top-0 z-2 h-full w-full flex overflow-auto bg-white/80 dark:bg-black/80">
           <div class="relative h-full w-full p-0 pl-50px">
-            <HotelDetails v-model="showHotelRoomsRouteQuery" v-model:hotelDetails="selectedHotelForDetails" v-model:selectedHotelId="selectedHotelIdRouteQuery" @show-hotel-images-viewer="showHotelImagesViewer" />
+            <HotelDetails
+              v-model="showHotelRoomsRouteQuery" v-model:hotelDetails="selectedHotelForDetails"
+              v-model:selectedHotelId="selectedHotelIdRouteQuery" @show-hotel-images-viewer="showHotelImagesViewer"
+            />
           </div>
         </div>
       </div>
@@ -550,7 +577,10 @@ onMounted(async () => {
         class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-0 transition-all md:h-full md:p-0"
         :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
       >
-        <div id="maps" ref="mapRef" class="h-full min-h-full w-full flex shadow-sm lt-md:h-[calc(100%+1.25rem)] md:border-0 md:rounded-0" />
+        <div
+          id="maps" ref="mapRef"
+          class="h-full min-h-full w-full flex shadow-sm lt-md:h-[calc(100%+1.25rem)] md:border-0 md:rounded-0"
+        />
       </div>
     </div>
   </div>

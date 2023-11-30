@@ -204,7 +204,7 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
                   Mes favoris
                 </template>
               </a-doption>
-              <a-doption>
+              <a-doption @click="async () => await router.push('/auth')">
                 <template #icon>
                   <span class="text-md i-carbon-login inline-block h-5 w-5 leading-30px" />
                 </template>

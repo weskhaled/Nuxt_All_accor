@@ -44,7 +44,7 @@ function handleSubmit({ values, errors }) {
   <div
     class="relative z-2 ml-0 max-w-xl w-full border border-zinc-5/10 rounded-2px bg-white/80 p-5 shadow-black/3 shadow-sm backdrop-blur md:mt-7 dark:bg-black/80"
   >
-    <a-form ref="formRef" class="[&_.arco-form-item-layout-vertical>.arco-form-item-label-col]:mb-0.5 [&_.arco-form-item]:mb-1 [&_.arco-form-item-label-required-symbol]:inline-flex ![&_.arco-form-item-label-col>.arco-form-item-label]:(text-sm/8 font-500)" layout="vertical" size="large" :model="filters" @submit="handleSubmit">
+    <a-form ref="formRef" class="[&_.arco-form-item-layout-vertical>.arco-form-item-label-col]:mb-0.5 [&_.arco-form-item]:mb-1 ![&_.arco-form-item-label-col>.arco-form-item-label]:(text-sm/8 font-500)" layout="vertical" size="large" :model="filters" @submit="handleSubmit">
       <div class="md:mt-2">
         <a-form-item field="destination" label="Destination" :rules="[{ required: true, message: 'destination is required' }]">
           <a-auto-complete

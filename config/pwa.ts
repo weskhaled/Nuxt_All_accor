@@ -36,7 +36,7 @@ export const pwa: ModuleOptions = {
     ],
   },
   workbox: {
-    globPatterns: ['**/*.{js,ts,css,scss,less,png,webp,svg,mp4,vue,ico}'],
+    globPatterns: ['**/*.{js,css,html,txt,png,ico,svg}'],
     // navigateFallbackDenylist: [/^\/api\//],
     navigateFallbackDenylist: [/^\/api\//, /^\/search?\//],
     navigateFallback: '/',

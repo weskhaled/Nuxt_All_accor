@@ -14,3 +14,5 @@ export const breakpoints = useBreakpoints(breakpointsTailwind)
 export const mdAndLarger = breakpoints.greaterOrEqual('md')
 export const smAndSmaller = breakpoints.smallerOrEqual('sm')
 export const mdAndSmaller = breakpoints.smallerOrEqual('md')
+
+export const userLang = ref('fr-FR')

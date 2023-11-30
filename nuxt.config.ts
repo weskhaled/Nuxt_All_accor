@@ -80,7 +80,7 @@ export default defineNuxtConfig({
   pwa,
 
   devtools: {
-    enabled: false,
+    enabled: true,
   },
 
   vite: {
