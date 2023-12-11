@@ -6,6 +6,8 @@ import duration from 'dayjs/plugin/duration'
 import dayOfYear from 'dayjs/plugin/dayOfYear'
 import utc from 'dayjs/plugin/utc'
 import isBetween from 'dayjs/plugin/isBetween'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import isoWeek from 'dayjs/plugin/isoWeek'
 
 export function useDayjs() {
   dayjs().format()
@@ -19,6 +21,8 @@ export function useDayjs() {
   dayjs.extend(utc)
   dayjs.extend(isBetween)
   dayjs.extend(dayOfYear)
+  dayjs.extend(isoWeek)
+  dayjs.extend(weekOfYear)
 
   return {
     dayjs: dayjs || useDateFormat,

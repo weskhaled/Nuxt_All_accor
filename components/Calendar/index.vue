@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { useVirtualList } from '@vueuse/core'
+import { breakpointsTailwind, useVirtualList } from '@vueuse/core'
 import Event from './Event.vue'
-import { mdAndLarger, mdAndSmaller, userLang } from '~/common/stores'
 
 interface Props {
   events?: Array<any>
@@ -11,16 +10,22 @@ const props = withDefaults(defineProps<Props>(), {
   events: () => [],
 })
 
-const emit = defineEmits(['eventChanged'])
-
-const { x: xMouse, y: yMouse } = useMouse({ type: 'client' })
+defineEmits(['eventChanged'])
+const breakpoints = useBreakpoints(breakpointsTailwind)
+const { y: yMouse } = useMouse({ type: 'client' })
 const { dayjs } = useDayjs()
-const timestamp = useTimestamp({ offset: 0 })
+
 const selectedDate = ref(dayjs().format('YYYY-MM-DD'))
 const dragHandlerEventResizeRef = ref<EventTarget | null>()
+const monthListRef = ref<HTMLElement | null>()
 const dragHandlerEventMoveRef = ref<EventTarget | null>()
+const selectedEvent = ref<any>(null)
 const timeIndicatorTop = ref<number>(0)
-// let cleanUp: () => void
+
+const { pressed } = useMousePressed()
+const { x: xMonthListRef } = useScroll(monthListRef)
+const { width: widthMonthListRef } = useElementSize(monthListRef)
+
 const coefficient = 1000 * 60 * 5
 
 const daysInYear = computed(() => {
@@ -50,13 +55,14 @@ const allItems = computed(() => {
 const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(
   allItems,
   {
+    overscan: 16,
     itemWidth: 280,
   },
 )
+
 const { y: yContainerRef } = useScroll(containerProps.ref)
 const { isOutside } = useMouseInElement(containerProps.ref)
 const { x, y } = useMouse({ target: containerProps.ref, type: 'client' })
-const { pressed } = useMousePressed()
 const { element } = useElementByPoint({ x, y })
 
 const selectedEventRef = computed(() => {
@@ -64,9 +70,11 @@ const selectedEventRef = computed(() => {
 
   return targetClicked ? targetClicked.closest('.event') : null
 })
+
 const eventDragOrResize = computed(() => {
   return dragHandlerEventMoveRef.value ? 'DRAG' : (dragHandlerEventResizeRef.value ? 'RESIZE' : null)
 })
+
 const selectedEventByRef = computed({
   get() {
     return selectedEventRef.value ? props.events.find(event => `${event.id}` === `${selectedEventRef.value?.dataset.event_id}`) : null
@@ -84,27 +92,30 @@ const selectedEventByRef = computed({
   },
 })
 
-watch([selectedEventRef, pressed, yMouse], ([selectedEventRefValue, pressedValue, yMouseValue]) => {
+watch([selectedEventRef, pressed, yMouse], async ([selectedEventRefValue, pressedValue, yMouseValue]) => {
+  await nextTick()
   if (selectedEventRefValue && pressedValue && selectedEventByRef.value) {
     if (eventDragOrResize.value === 'RESIZE') {
       containerProps.ref?.value?.classList?.add('event--resize')
-      selectedEventRefValue.classList.add('in--resize')
+      selectedEventByRef.value.inResize = true
       const { start } = selectedEventByRef.value
-      const durationFromMouseY = (((Math.round((yMouseValue) - (useElementBounding(selectedEventRef).y.value - 0))) * 60 / 90) * 60000)
+      const durationFromMouseY = (((Math.round((yMouseValue) - (useElementBounding(selectedEventRef).y.value - 2))) * 60 / 90) * 60000)
       const eventDuration = new Date(Math.round(new Date(new Date(start).getTime() + durationFromMouseY).getTime() / coefficient) * coefficient).getTime() - new Date(start).getTime()
+
       selectedEventByRef.value.end = dayjs((dayjs(start)))
-        .add(eventDuration, 'millisecond')
+        .add(eventDuration > 0 ? eventDuration : 0, 'millisecond')
         .second(0).format('YYYY-MM-DD HH:mm:ss')
     }
     else if (eventDragOrResize.value === 'DRAG') {
       containerProps.ref?.value?.classList?.add('event--move')
-      selectedEventRefValue.classList.add('in--move')
+      selectedEventByRef.value.inMove = true
       const { date, col_time } = element.value?.dataset
       if (!date || !col_time)
         return
 
       const dateTime = dayjs(`${date} ${col_time}`)
       const { start } = selectedEventByRef.value
+      const { duration } = selectedEvent.value
 
       selectedEventByRef.value.start = dayjs(start)
         .set('month', dateTime.month())
@@ -112,16 +123,28 @@ watch([selectedEventRef, pressed, yMouse], ([selectedEventRefValue, pressedValue
         .set('hour', dateTime.hour())
         .set('minute', dateTime.minute())
         .format('YYYY-MM-DD HH:mm:ss')
+      if (
+        dayjs(selectedEventByRef.value.start).add(duration, 'minute').date()
+        === dayjs(selectedEventByRef.value.start).date()
+      )
 
-      const duration = dayjs(dayjs(selectedEventByRef.value.end).set('date', dateTime.date()))
-        .diff((dayjs(selectedEventByRef.value.start)), 'minute')
-      selectedEventByRef.value.end = dayjs(selectedEventByRef.value.start).add(duration < 30 ? 30 : duration, 'minute').format('YYYY-MM-DD HH:mm:ss')
+        selectedEventByRef.value.end = dayjs(selectedEventByRef.value.start).add(duration || 60, 'minute').format('YYYY-MM-DD HH:mm:ss')
+
+      else
+        selectedEventByRef.value.end = dayjs(selectedEventByRef.value.start).add(1, 'day').set('hour', 0).set('minute', 0).format('YYYY-MM-DD HH:mm:ss')
     }
   }
 })
 
 watch(pressed, (value) => {
-  if (!value) {
+  if (value && selectedEventByRef.value) {
+    selectedEvent.value = toValue(selectedEventByRef)
+    const duration = dayjs(dayjs(selectedEventByRef.value.end)).diff((dayjs(selectedEventByRef.value.start)), 'minute')
+    selectedEvent.value && (selectedEvent.value.duration = duration)
+  }
+  else {
+    selectedEventByRef.value && (selectedEventByRef.value.inMove = false)
+    selectedEventByRef.value && (selectedEventByRef.value.inResize = false)
     selectedEventRef.value?.classList?.remove('in--resize')
     selectedEventRef.value?.classList?.remove('in--move')
     containerProps.ref?.value?.classList?.remove('event--move')
@@ -132,7 +155,9 @@ watch(pressed, (value) => {
 })
 
 watch(isOutside, (value) => {
-  if (!value) {
+  if (value) {
+    selectedEventByRef.value && (selectedEventByRef.value.inMove = false)
+    selectedEventByRef.value && (selectedEventByRef.value.inResize = false)
     selectedEventRef.value?.classList?.remove('in--resize')
     selectedEventRef.value?.classList?.remove('in--move')
     containerProps.ref?.value?.classList?.remove('event--move')
@@ -157,86 +182,127 @@ watch(selectedDate, (value) => {
   scrollTo(dayjs(value).dayOfYear() - 1)
 })
 
+watchThrottled(
+  () => list.value?.at(Math.round(list.value.length / 2))?.data?.date.month(),
+  (month) => {
+    if (month === undefined || !widthMonthListRef.value)
+      return
+
+    const itemsInView = breakpoints['2xl'].value ? 4 : (breakpoints.xl.value ? 3 : (breakpoints.lg.value ? 2 : 1))
+    const containerWidth = (widthMonthListRef.value - 180)
+    const monthWidth = containerWidth / itemsInView
+    const x = (monthWidth * month) - (containerWidth / itemsInView)
+    xMonthListRef.value = x < 0 ? 0 : (x > monthWidth * 12 ? monthWidth * 12 : x)
+  },
+  { throttle: 500 },
+)
+
+function scrollToEvent(day: number, month: number, year = dayjs(selectedDate.value).year()) {
+  selectedDate.value = dayjs().set('year', year).set('date', day).set('month', month).format('YYYY-MM-DD')
+  if (props.events.some(ev => dayjs(new Date(dayjs(selectedDate.value).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')))
+    yContainerRef.value = +(dayjs(props.events.find(ev => dayjs(new Date(dayjs(selectedDate.value).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')).start).hour() * 90)
+}
+
 onMounted(async () => {
   updateTimeIndicator()
   await nextTick()
   scrollTo(dayjs(selectedDate.value).dayOfYear() - 1)
-  // console.log(dayjs.duration(100))
-  // const e = props.events[0]
-  // const date = dayjs(dayjs(`${dayjs(selectedDate).year()}-01-01`).dayOfYear(2))
-  // const test = date.isBetween(dayjs(e.start), dayjs(e.end), 'day', '[]')
-  // console.log(date.format('YYYY-MM-DD'))
-  // console.log(dayjs(e.start).format('YYYY-MM-DD'))
-  // console.log(dayjs(e.end).format('YYYY-MM-DD'))
-  // console.log(test)
-  // scrollTo(88)
 })
 </script>
 
 <template>
-  <div class="flex-0 bg-slate-2 p-0 dark:bg-slate-7">
-    <div class="flex flex-col">
-      <div
-        class="grid grid-cols-12 w-full flex flex-nowrap select-none items-center justify-between overflow-auto overflow-y-hidden border-b-1px border-zinc-4/15 bg-white/15 px-2 py-4 text-center text-3 font-600 !hidden dark:bg-black/15"
-      >
-        <a
-          v-for="(month, index) in 12" :key="month" href="javascript;"
-          class="relative w-auto cursor-pointer px-1 capitalize"
-        >
-          <span
-            v-if="index === 12"
-            class="absolute bottom--1 right-[calc(50%-0.25rem)] mx-auto h-1 w-1 rounded-full bg-blue-5"
-          />
-          {{ month }}
-        </a>
+  <div class="z-2 h-full flex flex-1 flex-col snap-y snap-mandatory overflow-x-hidden">
+    <div class="flex flex flex-none flex-col snap-start overflow-hidden bg-white/90 backdrop-blur dark:bg-black/90">
+      <div class="h-[calc(100vh-7.5rem)] overflow-hidden border-b-1px border-gray-4/15 md:h-[calc(100vh-6.5rem)]">
+        <!-- <a-calendar v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD" class="custom-calendar" /> -->
+        <CalendarMonth v-model="selectedDate" :events="events" @event-clicked="(eventData) => scrollToEvent(dayjs(eventData.start).date(), dayjs(eventData.start).month())" />
       </div>
-      <a-date-picker
-        v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD"
-      >
-        <h3 class="flex px-2 text-2xl/12 font-semibold capitalize">
-          {{ dayjs(selectedDate).format('DD MMMM, YYYY') }}
-        </h3>
-      </a-date-picker>
-    </div>
-  </div>
-  <div class="z-2 h-full flex flex-1 flex-col bg-light-1 dark:bg-dark-9">
-    <div
-      class="z-9 flex flex-nowrap select-none snap-x snap-proximity items-center items-center overflow-auto overflow-y-hidden bg-white/75 text-center dark:bg-black/75"
-    >
       <div
-        v-for="month in Array.from({ length: 12 }, (_, i) => i)" :key="month"
-        class="relative mx-5 min-w-50 snap-center p-x-1.5 py-3 pb-3.2 text-center"
+        ref="monthListRef"
+        class="z-9 h-16 w-full flex flex-nowrap select-none items-center overflow-auto overflow-y-hidden text-center space-x-0"
       >
-        <a-badge
-          class="w-full"
-          :count="events.filter(ev => dayjs().set('date', 1).set('month', month).isBetween(dayjs(ev.start), dayjs(ev.end), 'month', '[]')).length"
+        <div
+          class="sticky left-0 z-22 h-full min-w-45 border-r-1px border-zinc-3/20 bg-slate-2/30 px-1 backdrop-blur dark:border-zinc-6/20 dark:bg-slate-8/30"
         >
-          <a-button
-            type="primary" shape="round" long class="!bg-blue/30"
-            @click="() => selectedDate = dayjs(selectedDate).set('date', 1).set('month', month).format('YYYY-MM-DD')"
+          <a-date-picker v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD">
+            <h3 role="button" class="grid mx-auto h-full items-center px-2 text-sm/12 font-semibold capitalize">
+              {{ dayjs(selectedDate).format('DD MMMM, YYYY') }}
+            </h3>
+          </a-date-picker>
+        </div>
+        <div class="h-full w-full flex flex-none flex-row flex-nowrap px-0">
+          <div
+            v-for="month in Array.from({ length: 12 }, (_, i) => i)" :key="month" role="button"
+            class="group min-w-95 flex-none basis-[calc((calc(100%-11.25rem)/1))] px-0 transition-all-200 2xl:basis-[calc((calc(100%-11.25rem)/4))] lg:basis-[calc((calc(100%-11.25rem)/2))] xl:basis-[calc((calc(100%-11.25rem)/3))] hover:bg-blue-5/15 first:pl-2 last:pr-2"
+            :class="{
+              'bg-blue-4/15 month--active': dayjs().set('month', month).isSame(dayjs(selectedDate), 'month'),
+            }"
           >
-            <span class="tracking-0.5 capitalize text-black !font-600 dark:text-white">
-              {{ dayjs().set('month', month).format('MMMM') }}
-            </span>
-          </a-button>
-        </a-badge>
-        <span class="absolute bottom--0.75 right-[calc(50%-0.25rem)] mx-auto hidden h-2 w-2 rounded-full bg-blue-5" />
+            <div class="h-full w-full">
+              <div class="relative h-full w-full">
+                <div
+                  class="pt-2.5"
+                  @click="() => selectedDate = dayjs(selectedDate).set('date', 1).set('month', month).format('YYYY-MM-DD')"
+                >
+                  <a-badge
+                    class=""
+                    :count="events.filter(ev => dayjs(selectedDate).set('date', 1).set('month', month).isBetween(dayjs(ev.start), dayjs(ev.end), 'month', '[]')).length"
+                  >
+                    <span
+                      class="inline from-blue-5 to-sky-6 bg-gradient-to-r bg-clip-text text-7/5 text-transparent font-black tracking-0.6 capitalize opacity-40 transition-all !group-[.month--active]:opacity-90 dark:group-hover:opacity-80"
+                    >
+                      {{ dayjs().set('month', month).format('MMMM') }}
+                    </span>
+                  </a-badge>
+                </div>
+                <div
+                  class="absolute bottom-3 z-5 w-full flex justify-between before:pointer-events-none before:absolute before:top-7px before:h-3px before:w-full before:bg-gray-4/20 before:content-[''] group-first:before:rounded-l-2px group-last:before:rounded-r-2px"
+                >
+                  <template v-for="day in dayjs(new Date(dayjs(selectedDate).year(), month + 1, 0)).date()" :key="day">
+                    <a-tooltip
+                      :content="`${dayjs(new Date(dayjs(selectedDate).year(), month, day)).format('DD')}`"
+                      position="top" mini
+                    >
+                      <span
+                        role="button"
+                        class="group/slider relative z-6 h-16px w-full flex cursor-pointer items-center justify-center"
+                        @click="scrollToEvent(day, month, dayjs(selectedDate).year())"
+                      >
+                        <span
+                          class="block h-7px w-7px rounded-0 rounded-full !m-auto group-hover/slider:bg-blue-5"
+                          :class="{
+                            '!bg-blue-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(selectedDate), 'date'),
+                            'bg-green-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(), 'date'),
+                            'bg-gray-4/25': events.some(ev => dayjs(new Date(dayjs(selectedDate).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')),
+                          }"
+                        />
+                      </span>
+                    </a-tooltip>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="relative flex flex-auto border-t-0px border-gray-2/20">
+    <div class="relative flex flex-auto snap-start border-t-1px border-gray-4/25 bg-light-1 dark:bg-dark-9">
       <div
-        class="content-stretch relative ml-0 h-[calc(100vh-9.15rem)] min-h-92 flex flex-auto flex-nowrap items-stretch overflow-auto overflow-auto"
+        class="content-stretch relative ml-0 h-[calc(100vh-4rem)] min-h-92 flex flex-auto flex-nowrap items-stretch overflow-auto overflow-auto md:h-[calc(100vh-6.65rem)]"
       >
-        <div v-bind="containerProps" class="calendar--container z-8 h-full">
-          <div v-bind="wrapperProps" id="days-per-year" class="relative min-h-0 min-w-0 inline-flex flex-auto before-z-4">
+        <div v-bind="containerProps" class="calendar--container z-8 h-full snap-none">
+          <div
+            v-bind="wrapperProps" id="days-per-year"
+            class="relative min-h-0 min-w-0 before-z-4 !h-auto"
+          >
+            <!-- time-indicator -->
             <span
               class="time-indicator pointer-events-none absolute z-70 block h-1px w-full bg-green/45"
               :style="{ top: `${timeIndicatorTop}px` }"
             />
+            <!-- sticky left indicator -->
             <div class="sticky left-0 z-99 h-full select-none">
-              <div
-                class="time-fixed-side relative left-0 z-10 mt-8 min-w-11 w-11 flex flex-col text-3"
-              >
+              <div class="time-fixed-side relative left-0 z-10 mt-8 min-w-45px w-45px flex flex-col text-3">
                 <span
                   class="absolute left-0 top--8 z-9 h-8.25 w-11 border-b-1px border-r-1px border-zinc-2/30 bg-slate-2/30 backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
                 />
@@ -244,14 +310,19 @@ onMounted(async () => {
                   v-for="time in Array.from({ length: 24 }, (_, i) => `${i < 10 ? '0' : ''}${i}`)" :key="time"
                   class="min-h-90px border-r-1px border-zinc-3/30 bg-slate-2/30 text-center backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
                 >
-                  <span class="top-8.5 mt--2.5 block bg-white p-1 text-2.6/3 dark:bg-dark" :class="{ hidden: time === '00' }">
+                  <span
+                    class="top-8.5 mt--2.5 block bg-white p-1 text-2.6/3 dark:bg-dark"
+                    :class="{ hidden: time === '00' }"
+                  >
                     {{ time }} {{ +time < 12 ? 'AM' : 'PM' }} </span>
                 </div>
               </div>
             </div>
             <div
-              v-for="item in list" :id="`${item.index + 1}`" :key="item.index"
-              class="day inline-table !w-70"
+              v-for="item in list" :id="`${item.index + 1}`" :key="item.index" class="day !w-280px"
+              :class="{
+                'bg-blue-5/5': dayjs().isSame(item.data.date, 'date'),
+              }"
             >
               <div class="relative h-auto w-full">
                 <div class="flex-0 sticky top-0 z-80 select-none px-0 uppercase">
@@ -293,67 +364,42 @@ onMounted(async () => {
                   </div>
                   <!-- events -->
                   <div class="events-card">
-                    <div
-                      v-for="event in item.data.events" :key="event.id" :data-event_id="event.id"
-                      :data-date="item.data.date" draggable="false"
-                      :style="{ top: `${event.top}px`, height: `${event.height}px`, backgroundColor: event.color }"
-                      :class="[dayjs(event.start).day() === item.data.date.day() ? 'rounded-2px' : 'rounded-b-2px']"
+                    <Event
+                      v-for="(event, index) in item.data.events"
+                      :key="event.id"
+                      :data-event_id="event.id"
+                      :data-date="item.data.date"
+                      :style="{
+                        top: `${event.top}px`,
+                        height: `${event.height}px`,
+                        backgroundColor: event.color,
+                        zIndex: selectedEvent?.id === event.id ? index + 2 : index,
+                      }"
+                      :class="[
+                        dayjs(event.start).day() === item.data.date.day() && 'rounded-tr-2px',
+                        event.inMove && 'in--move',
+                        event.inResize && 'in--resize',
+                      ]"
                       class="event"
+                      :event="event"
+                      show-duration
+                      :date="item.data.date"
+                      @mouse-down-handler-event-move="(e) => dragHandlerEventMoveRef = e.target"
+                      @mouse-down-handler-event-resize="(e) => dragHandlerEventResizeRef = e.target"
                     >
-                      <div class="h-full flex flex-col">
-                        <div
-                          v-if="dayjs(event.start).day() === item.data.date.day()"
-                          class="h-full flex flex-col select-none"
-                        >
-                          <div class="event-header bg-black/20">
-                            <h4 class="truncate pl-1 pr-6 text-4.2/7">
-                              {{ event.title }}
-                            </h4>
-                          </div>
-                          <div class="event-content flex-1 overflow-auto p-1 text-4">
-                            <span>
-                              {{ event.title }}
-                            </span>
-                            <div>
-                              {{ event.start }}
-                            </div>
-                            <div>
-                              {{ event.end }}
-                            </div>
-                            <div>
-                              {{ event.duration }}
-                            </div>
-                          </div>
-                          <div
-                            class="hover:bg-slate-3-3 absolute right-0 top-0 h-6 w-6 flex cursor-grab items-center rounded-bl-2px bg-slate-2/50 transition-all delay-0s group-focus:cursor-grabbing active:bg-slate-3"
-                            @mousedown="(e) => dragHandlerEventMoveRef = e.target"
+                      <template #content>
+                        <div class="h-full flex flex-col justify-between pb-1">
+                          <h4>
+                            {{ event.start }}
+                          </h4>
+                          <a-button
+                            size="mini" type="primary" class="mt-1"
                           >
-                            <span class="mx-auto h-4.5 w-4.5 !text-dark-5">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24">
-                                <path
-                                  fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                  stroke-width="1.5"
-                                  d="M12 12L4 4m0 0v4m0-4h4m4 8l8-8m0 0v4m0-4h-4m-4 8l-8 8m0 0v-4m0 4h4m4-8l8 8m0 0v-4m0 4h-4"
-                                />
-                              </svg>
-                            </span>
-                          </div>
+                            Edit
+                          </a-button>
                         </div>
-                        <div class="absolute bottom-0 mb-1 w-full select-none text-center">
-                          <span class="inline-block rounded-2px rounded-b-0 bg-dark-7 p-0.3 px-0.7 text-3.1/3.5 font-sans text-white">
-                            <span>{{
-                              dayjs.duration(dayjs(event.end).diff(dayjs(event.start))).format(+dayjs.duration(dayjs(event.end).diff(dayjs(event.start))).format('DD')
-                                > 0 ? 'D, HH:mm' : 'HH:mm') }}</span>
-                          </span>
-                        </div>
-                        <div
-                          class="absolute bottom-0 h-1 w-full flex cursor-s-resize items-center bg-slate-2/50 transition-all delay-0.3s active:bg-slate-3 hover:bg-slate-3"
-                          @mousedown="(e) => dragHandlerEventResizeRef = e.target"
-                        >
-                          <span i-carbon-subtract class="mx-auto h-2 w-4 !text-dark-5" />
-                        </div>
-                      </div>
-                    </div>
+                      </template>
+                    </Event>
                   </div>
                 </div>
               </div>
@@ -368,24 +414,70 @@ onMounted(async () => {
 <style lang="less">
 .calendar--container {
   .events-card {
-      @apply absolute top-0 w-full h-full;
-      .event {
-        @apply absolute group left-0 min-h-max w-full flex-1 overflow-hidden pb-2px text-white;
-        &.in--move {
-          @apply opacity-90;
+    @apply absolute top-0 w-full h-full;
+
+    .event {
+      @apply absolute group left-0 min-h-max w-full flex-1 pb-2px text-white;
+
+      &.in--move, &.in--resize {
+        @apply opacity-75 origin-top-right scale-100 z-45;
+        div > * {
+          @apply !select-none;
         }
       }
+
+      .event-dragger {}
+    }
   }
+
   &.event--move {
     @apply cursor-grabbing;
 
     .event {
       @apply !pointer-events-none cursor-grabbing transition-all-0;
+
+      .event-dragger {
+        @apply !pointer-events-none;
+      }
     }
 
     .events-card {
       @apply absolue top-0 w-full h-full;
       @apply !pointer-events-none;
+    }
+  }
+}
+
+.arco-calendar.custom-calendar {
+  @apply flex flex-col !border-0 h-full;
+  --color-neutral-3: rgba(135, 135, 135, 0.10);
+
+  .arco-calendar-header {
+    @apply flex-0 p4 border-b-1px border-gray-5/15;
+  }
+
+  .arco-calendar-body {
+    @apply h-full p0 overflow-auto;
+
+    .arco-calendar-month {
+      @apply flex flex-col h-full;
+
+      .arco-calendar-month-cell-body {
+        @apply flex flex-col h-full;
+
+        .arco-calendar-month-row {
+          @apply h-1/6;
+        }
+      }
+    }
+
+    .arco-calendar-year {
+      @apply flex flex-col h-full;
+
+      .arco-calendar-year-row {
+        @apply h-1/3 min-h-65;
+      }
+
     }
   }
 }

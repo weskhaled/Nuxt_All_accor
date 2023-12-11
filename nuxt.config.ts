@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@vite-pwa/nuxt',
     '@nuxt/devtools',
+    'nuxt-auth-utils',
   ],
 
   runtimeConfig: {
@@ -21,6 +22,12 @@ export default defineNuxtConfig({
       API_ACCOR_URL: process.env.API_ACCOR_URL,
       API_ACCOR_API_KEY: process.env.API_ACCOR_API_KEY,
       DATABASE_URL: process.env.DATABASE_URL,
+    },
+    oauth: {
+      google: {
+        clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
+        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+      },
     },
   },
 
@@ -104,6 +111,7 @@ export default defineNuxtConfig({
 
   devServer: {
     port: 3333,
+    https: false,
   },
 
   build: {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { isAuthenticated, refreshToken, token } from '~/common/stores'
+const { loggedIn, user, session, clear } = useUserSession()
 
 definePageMeta({
   layout: 'auth',
@@ -19,8 +19,13 @@ const loginForm = reactive({
 })
 
 onMounted(async () => {
-  if (isAuthenticated.value)
-    await router.push({ name: '/admin/' })
+  if (loggedIn.value) {
+    const data = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList')
+    console.log('list', data)
+  }
+
+  console.log('mounted', user.value?.google?.name)
+  console.log('mounted', session.value)
 })
 </script>
 
@@ -31,9 +36,9 @@ onMounted(async () => {
     <div class="w-full flex flex-row">
       <!-- Sidebar -->
       <div class="hidden flex-col justify-between bg-blue-7 text-white lg:max-w-sm xl:max-w-1/2 lg:flex lg:p-8 xl:p-12">
-        <a href="" class="flex items-center justify-start space-x-3" @click.stop="async() => await router.push('/')">
+        <a href="javascript:;" class="flex items-center justify-start space-x-3" @click.stop="async() => await router.push('/')">
           <span class="h-8 w-8 rounded-full bg-white" />
-          <span href="#" class="text-3xl font-medium font-script">
+          <span class="text-3xl font-medium font-script">
             All.accor
           </span>
         </a>
@@ -58,16 +63,16 @@ onMounted(async () => {
       <div class="relative flex flex-1 flex-col items-center justify-center px-10">
         <div class="w-full flex items-center justify-between py-4 lg:hidden">
           <div class="flex items-center justify-start space-x-3">
-            <a href="" class="flex items-center justify-start space-x-3" @click.stop="router.push('/')">
+            <a href="javascript:;" class="flex items-center justify-start space-x-3" @click.stop="async() => await router.push('/')">
               <span class="h-8 w-8 rounded-full bg-blue" />
-              <span href="#" class="text-3xl font-medium font-script dark:text-light-50">
+              <span class="text-3xl font-medium font-script dark:text-light-50">
                 All.accor
               </span>
             </a>
           </div>
           <div class="flex items-center space-x-2">
             <span class="hidden md:inline-block">Not a member? </span>
-            <a href="#" class="font-medium text-[#070eff] underline">
+            <a href="#" class="text-[#070eff] font-medium underline">
               Sign up now
             </a>
           </div>
@@ -122,7 +127,7 @@ onMounted(async () => {
               <span class="px-4">Or</span>
               <span class="w-full border-1px border-gray-200/30" />
             </div>
-            <a-button shape="round" type="primary" html-type="submit" class="group overflow-hidden !h-12 !w-full !border-blue-9/50 !rounded-full !text-white" size="large">
+            <a-button shape="round" type="primary" html-type="submit" class="group overflow-hidden !h-12 !w-full !border-blue-9/50 !rounded-full !text-white" size="large" href="/api/auth/google" role="link">
               <span class="flex-1 text-4.5 font-500 font-mono">
                 Sign in with Google
               </span>

@@ -62,7 +62,7 @@ async function handleSearch(filters: any) {
             <div
               class="relative col-start-1 row-start-1 flex flex-col-reverse rounded-lg from-black/75 via-black/0 bg-gradient-to-t p-3 lg:row-start-1 sm:row-start-2 sm:bg-none sm:p-0"
             >
-              <h1 class="mt-1 text-lg font-semibold text-white lg:text-6xl md:text-2xl sm:text-slate-900 dark:sm:text-white">
+              <h1 class="mt-1 text-lg text-white font-semibold lg:text-6xl md:text-2xl sm:text-slate-900 dark:sm:text-white">
                 Des destinations qui pourraient vous plaire
               </h1>
             </div>
@@ -94,7 +94,7 @@ async function handleSearch(filters: any) {
               </dt>
               <dd class="mr-3 flex items-center text-blue-600 dark:text-blue-200">
                 <span i-carbon-star-filled />
-                <span>4.89 <span class="font-normal text-slate-400">(128)</span></span>
+                <span>4.89 <span class="text-slate-400 font-normal">(128)</span></span>
               </dd>
               <dt class="sr-only">
                 Location
@@ -158,12 +158,12 @@ async function handleSearch(filters: any) {
             class="relative inline-block border border-zinc-4/20 bg-zinc-9/1 px-6 py-4 backdrop-blur backdrop-filter dark:bg-zinc-1/1"
           >
             <div
-              class="absolute inset-0 h-full w-full bg-[url(/img/slider-3.avif)] bg-cover bg-fixed bg-center bg-no-repeat opacity-5 grayscale"
+              class="absolute inset-0 h-full w-full bg-cover bg-fixed bg-center bg-no-repeat opacity-5 grayscale"
             />
             <button
               class="absolute left--6 top--6 z-2 block h-10 w-10 flex content-center justify-center border border-blue-8/20 bg-blue-6/90 backdrop-blur transition-all active:(border-blue-8 bg-blue-7/80) hover:bg-blue-7/90"
             >
-              <span i-carbon-ibm-watson-machine-learning m-auto block text-sm leading-8 text-white class="icon-shadow" />
+              <span i-carbon-ibm-watson-machine-learning m-auto block text-sm text-white leading-8 class="icon-shadow" />
             </button>
             <h2
               class="inline from-slate-7 to-purple-4 bg-gradient-to-r bg-clip-text fill-transparent text-2xl/10 font-extrabold capitalize dark:from-blue-1 dark:to-purple-3 md:text-5xl/20"
@@ -177,7 +177,7 @@ async function handleSearch(filters: any) {
           </div>
         </div>
         <div
-          class="pointer-events-none absolute right-0 top-0 h-full w-full bg-black bg-[url(https://images.unsplash.com/photo-1470016342826-876ea880d0be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80)] bg-cover bg-top-center opacity-85 mix-blend-multiply dark:rotate-180 dark:bg-[url(https://images.unsplash.com/photo-1485673634125-0f3ae8fd3209?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80)] dark:mix-blend-lighten"
+          class="pointer-events-none absolute right-0 top-0 h-full w-full bg-[url(https://images.unsplash.com/photo-1470016342826-876ea880d0be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80)] bg-black bg-cover bg-top-center opacity-85 mix-blend-multiply dark:rotate-180 dark:bg-[url(https://images.unsplash.com/photo-1485673634125-0f3ae8fd3209?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80)] dark:mix-blend-lighten"
         />
       </div>
     </section>

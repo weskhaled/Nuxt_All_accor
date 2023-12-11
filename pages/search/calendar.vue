@@ -25,9 +25,16 @@ const events = ref([
   },
   {
     id: uuid(),
+    title: 'loerem ipsum dolor sit amet, consectetur adipiscing elit',
+    start: '2023-06-04 14:30:00',
+    end: '2023-06-04 17:00:00',
+    color: '#00fafa',
+  },
+  {
+    id: uuid(),
     title: 'Event 2',
     start: dayjs().add(1, 'day').hour(3).minute(5).second(0).format('YYYY-MM-DD HH:mm:ss'),
-    end: dayjs().add(1, 'day').hour(3).minute(55).second(0).format('YYYY-MM-DD HH:mm:ss'),
+    end: dayjs().add(1, 'day').hour(4).minute(55).second(0).format('YYYY-MM-DD HH:mm:ss'),
     color: '#0f766e',
   },
   {
