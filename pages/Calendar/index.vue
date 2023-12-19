@@ -5,7 +5,7 @@ import { useStorage } from '@vueuse/core'
 const { dayjs } = useDayjs()
 
 definePageMeta({
-  layout: 'search',
+  layout: 'main',
 })
 
 const events = ref([

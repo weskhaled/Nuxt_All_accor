@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { currentUser, sideFixed, sideHidden } from '~/common/stores/index'
+import { sideHidden } from '~/common/stores/index'
+
+const { loggedIn, user, session, clear } = useUserSession()
 
 const color = useColorMode()
 const route = useRoute()
@@ -170,17 +172,24 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
         </a-tooltip>
         <div class="border-l-0 border-zinc-4/20 pl-1">
           <a-dropdown trigger="hover">
-            <a-button class="!px-1.7" shape="round" status="success">
+            <a-button class="!px-1.5" shape="round" status="success">
               <span class="flex items-center">
-                <span class="i-carbon-user-avatar-filled mr-1 inline-block h-5 w-5 text-sm leading-30px" />
-                <span class="hidden sm:inline-block">
-                  {{ currentUser ? currentUser?.fullName : 'Mon compte et mes points ' }}
+                <span v-if="!loggedIn" class="i-carbon-user-avatar-filled mr-1 inline-block h-5 w-5 text-sm" />
+                <template v-else>
+                  <img
+                    :src="user.google.picture"
+                    :alt="user.google.name"
+                    class="mr-1 inline-block h-5 w-5 rounded-full text-sm"
+                  >
+                </template>
+                <span class="hidden capitalize sm:inline-block">
+                  {{ loggedIn ? user.google.name : 'Se connecter' }}
                 </span>
-                <span class="i-carbon-chevron-down ml-0.5 inline-block h-3 w-3 text-sm leading-30px" />
+                <span class="i-carbon-chevron-down ml-0.75 inline-block h-3 w-3 text-sm leading-30px" />
               </span>
             </a-button>
             <template #content>
-              <a-doption>
+              <a-doption @click="$router.push('/calendar')">
                 <template #icon>
                   <span class="text-md i-carbon-calculation inline-block h-5 w-5 leading-30px" />
                 </template>
@@ -204,12 +213,20 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
                   Mes favoris
                 </template>
               </a-doption>
-              <a-doption @click="async () => await router.push('/auth')">
+              <a-doption v-if="!loggedIn" @click="async () => await router.push('/auth')">
                 <template #icon>
                   <span class="text-md i-carbon-login inline-block h-5 w-5 leading-30px" />
                 </template>
                 <template #default>
                   Se connecter
+                </template>
+              </a-doption>
+              <a-doption v-else @click="clear()">
+                <template #icon>
+                  <span class="text-md i-carbon-logout inline-block h-5 w-5 leading-30px" />
+                </template>
+                <template #default>
+                  De connecter
                 </template>
               </a-doption>
             </template>

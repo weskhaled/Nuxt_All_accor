@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { breakpointsTailwind, useVirtualList } from '@vueuse/core'
+import { useRouteHash } from '@vueuse/router'
 import Event from './Event.vue'
 
 interface Props {
@@ -11,6 +12,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 defineEmits(['eventChanged'])
+const routeHash = useRouteHash()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const { y: yMouse } = useMouse({ type: 'client' })
 const { dayjs } = useDayjs()
@@ -212,10 +214,10 @@ onMounted(async () => {
 
 <template>
   <div class="z-2 h-full flex flex-1 flex-col snap-y snap-mandatory overflow-x-hidden">
-    <div class="flex flex flex-none flex-col snap-start overflow-hidden bg-white/90 backdrop-blur dark:bg-black/90">
+    <!-- grid months -->
+    <div id="grid-months" class="relative flex flex flex-none flex-col snap-start overflow-hidden bg-white/87 backdrop-blur dark:bg-black/87">
       <div class="h-[calc(100vh-7.5rem)] overflow-hidden border-b-1px border-gray-4/15 md:h-[calc(100vh-6.5rem)]">
-        <!-- <a-calendar v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD" class="custom-calendar" /> -->
-        <CalendarMonth v-model="selectedDate" :events="events" @event-clicked="(eventData) => scrollToEvent(dayjs(eventData.start).date(), dayjs(eventData.start).month())" />
+        <CalendarMonth v-model="selectedDate" :events="events" @event-clicked="(eventData) => (scrollToEvent(dayjs(eventData.start).date(), dayjs(eventData.start).month()), routeHash = '#grid-events')" />
       </div>
       <div
         ref="monthListRef"
@@ -242,7 +244,7 @@ onMounted(async () => {
               <div class="relative h-full w-full">
                 <div
                   class="pt-2.5"
-                  @click="() => selectedDate = dayjs(selectedDate).set('date', 1).set('month', month).format('YYYY-MM-DD')"
+                  @click="() => (selectedDate = dayjs(selectedDate).set('date', 1).set('month', month).format('YYYY-MM-DD'), routeHash = '#grid-months')"
                 >
                   <a-badge
                     class=""
@@ -286,7 +288,8 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    <div class="relative flex flex-auto snap-start border-t-1px border-gray-4/25 bg-light-1 dark:bg-dark-9">
+    <!-- grid events  -->
+    <div id="grid-events" class="relative flex flex-auto snap-start border-t-1px border-gray-4/25 bg-light-1 dark:bg-dark-9">
       <div
         class="content-stretch relative ml-0 h-[calc(100vh-4rem)] min-h-92 flex flex-auto flex-nowrap items-stretch overflow-auto overflow-auto md:h-[calc(100vh-6.65rem)]"
       >
@@ -301,10 +304,10 @@ onMounted(async () => {
               :style="{ top: `${timeIndicatorTop}px` }"
             />
             <!-- sticky left indicator -->
-            <div class="sticky left-0 z-99 h-full select-none">
+            <div class="sticky left-0 z-99 h-full flex-none select-none">
               <div class="time-fixed-side relative left-0 z-10 mt-8 min-w-45px w-45px flex flex-col text-3">
                 <span
-                  class="absolute left-0 top--8 z-9 h-8.25 w-11 border-b-1px border-r-1px border-zinc-2/30 bg-slate-2/30 backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
+                  class="absolute left-0 top--8 z-9 h-8.25 w-11.25 border-b-1px border-r-1px border-zinc-2/30 bg-slate-2/30 backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
                 />
                 <div
                   v-for="time in Array.from({ length: 24 }, (_, i) => `${i < 10 ? '0' : ''}${i}`)" :key="time"
@@ -319,7 +322,7 @@ onMounted(async () => {
               </div>
             </div>
             <div
-              v-for="item in list" :id="`${item.index + 1}`" :key="item.index" class="day !w-280px"
+              v-for="item in list" :id="`${item.index + 1}`" :key="item.index" class="day flex-none !w-280px"
               :class="{
                 'bg-blue-5/5': dayjs().isSame(item.data.date, 'date'),
               }"

@@ -17,6 +17,7 @@ export function useDayjs() {
   }
 
   dayjs.locale('fr')
+  // dayjs.locale('en')
   dayjs.extend(duration)
   dayjs.extend(utc)
   dayjs.extend(isBetween)

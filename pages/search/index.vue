@@ -6,7 +6,7 @@ import { useRouteQuery } from '@vueuse/router'
 import { A } from '@mobily/ts-belt'
 
 definePageMeta({
-  layout: 'search',
+  layout: 'main',
 })
 
 const { dayjs } = useDayjs()
@@ -17,7 +17,7 @@ const { googleMapsApi, gMapsInstance, googleMapsCoreApi, MarkerClusterer, mapToo
 const nightsRouteQuery = useRouteQuery('nights')
 const searchHotelInput: any = useRouteQuery('searchHotelInput')
 const showHotelRoomsRouteQuery: any = useRouteQuery('showHotelRooms', null)
-const destinationRouteQuery = useRouteQuery('destination')
+const destinationRouteQuery = useRouteQuery('destination', 'Paris')
 const selectedHotelIdRouteQuery = useRouteQuery('selectedHotelId')
 const dateFromRouteQuery = useRouteQuery('dateFrom', dayjs().format('YYYY-MM-DD'))
 const dateToRouteQuery = useRouteQuery('dateTo', dayjs().add(5, 'day').format('YYYY-MM-DD'))
@@ -83,8 +83,7 @@ const options = computed<UseFuseOptions<any>>(() => ({
     isCaseSensitive: false,
     includeScore: false,
     shouldSort: false,
-    includeMatches: false,
-    findAllMatches: false,
+    includeMatches: true,
     minMatchCharLength: 3,
     threshold: 0,
     useExtendedSearch: true,
@@ -430,10 +429,10 @@ onMounted(async () => {
                   <a-button size="small" type="primary">
                     Share
                   </a-button>
-                  <a-button class="flex" size="small" long type="outline">
+                  <a-button class="flex" size="small" long type="outline" status="danger">
                     <span i-carbon-favorite class="md:mr-1" />
                     <span class="hidden md:inline-block">
-                      save Search
+                      Save Search
                     </span>
                   </a-button>
                 </div>
@@ -492,7 +491,7 @@ onMounted(async () => {
                       {{ destinationRouteQuery }}
                     </span>
                   </h3>
-                  <div class="hidden h-full items-center !w-65 md:flex !2xl:w-122.5">
+                  <div class="hidden items-center md:flex !2xl:w-122.5 !md:w-65">
                     <a-input-search
                       v-model="filters.searchInput" allow-clear search-button class="w-full"
                       placeholder="Please enter something"
@@ -574,7 +573,7 @@ onMounted(async () => {
         </div>
       </div>
       <div
-        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-0 transition-all md:h-full md:p-0"
+        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex overflow-hidden p-0 transition-all md:h-full md:p-0"
         :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
       >
         <div

@@ -24,7 +24,7 @@ onMounted(async () => {
     console.log('list', data)
   }
 
-  console.log('mounted', user.value?.google?.name)
+  console.log('mounted', user.value)
   console.log('mounted', session.value)
 })
 </script>

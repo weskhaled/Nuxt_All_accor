@@ -3,8 +3,6 @@ import enUS from '@arco-design/web-vue/es/locale/lang/en-us'
 import frFR from '@arco-design/web-vue/es/locale/lang/fr-fr'
 import { appName } from '~/constants'
 
-import 'animate.css'
-
 const locales: any = {
   'en-US': enUS,
   'fr-FR': frFR,

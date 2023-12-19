@@ -186,7 +186,7 @@ watchDebounced(
                   <h1 class="m-0 my-1 mt-2 text-xl font-bold tracking-tight font-mono sm:text-2xl">
                     {{ hotelDetails?.hotel?.name }}
                   </h1>
-                  <h5 class="my-1 text-xl font-semibold tracking-tight text-gray-900 dark:text-white">
+                  <h5 class="my-1 text-xl text-gray-900 font-semibold tracking-tight dark:text-white">
                     Hôtel
                     <a-rate
                       v-model="hotelStars"
@@ -197,7 +197,7 @@ watchDebounced(
                       </template>
                     </a-rate>
                   </h5>
-                  <p :title="hotelDetails?.hotel?.description" class="mb-2 overflow-hidden truncate font-normal text-gray-700 dark:text-gray-400">
+                  <p :title="hotelDetails?.hotel?.description" class="mb-2 overflow-hidden truncate text-gray-700 font-normal dark:text-gray-400">
                     {{ hotelDetails?.hotel?.description }}
                   </p>
                   <div class="flex border-t-1px border-bluegray-5/25 py-2 space-x-1">
@@ -235,7 +235,7 @@ watchDebounced(
                       <span class="block text-zinc-5">(frais et taxes inclus)</span>
                     </span>
 
-                    <span class="text-lg font-light text-gray-900 lg:text-3xl dark:text-white" :class="[selectedTariffChanged && 'animate__animated animate__bounce']">
+                    <span class="text-lg text-gray-900 font-light lg:text-3xl dark:text-white" :class="[selectedTariffChanged && 'animate__animated animate__bounce']">
                       {{ (selectedRoomOffer?.offer?.pricing?.amount?.afterTax || 0).toLocaleString('fr-FR', { style: 'currency', currency: selectedRoomOffer?.offer?.pricing?.currency || 'EUR' }) }}
                     </span>
                   </div>
@@ -253,7 +253,7 @@ watchDebounced(
                 </div>
               </div>
             </div>
-            <h1 class="mb-4 hidden text-center text-2xl font-extrabold text-gray-900 lg:block lg:text-5xl md:text-4xl dark:text-white">
+            <h1 class="mb-4 hidden text-center text-2xl text-gray-900 font-extrabold lg:block lg:text-2xl xl:text-5xl dark:text-white">
               <span class="from-sky-4 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent">Les bons plans</span> du moment.
             </h1>
           </div>
@@ -266,7 +266,7 @@ watchDebounced(
                     <img class="mr-2 h-full max-h-35 w-full rounded-2px object-cover md:h-auto xl:w-48" :src="`https://www.ahstatic.com/photos/${hotelDetails?.hotel?.id.toLowerCase()}_ro${room.code.toLowerCase()}_00_p_346x260.jpg`" alt="">
                     <div class="h-auto w-full flex flex-col justify-between">
                       <div class="">
-                        <h5 class="my-1 text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        <h5 class="my-1 text-xl text-gray-900 font-bold tracking-tight dark:text-white">
                           {{ room.roomClass?.label }}
                         </h5>
                         <div>
@@ -299,7 +299,7 @@ watchDebounced(
                           </h4>
                         </template>
                         <template v-if="room.offers[0]" #extra>
-                          <h5 class="md:text-md rounded-full bg-indigo-4/10 px-2.5 text-center text-sm font-600 text-gray-900 lg:block dark:bg-indigo-4/10 dark:text-white">
+                          <h5 class="md:text-md rounded-full bg-indigo-4/10 px-2.5 text-center text-sm text-gray-900 font-600 lg:block dark:bg-indigo-4/10 dark:text-white">
                             <span class="from-sky-3 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent">From</span>
                             <span class="ml-1 font-500">
                               {{ (room.offers[0]?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: room.offers[0]?.pricing?.currency || 'EUR' }) }}
@@ -326,7 +326,7 @@ watchDebounced(
                                         {{ item?.description }}
                                       </a-typography-text>
                                       <div text-right>
-                                        <span class="text-lg font-light text-gray-900 lg:text-xl dark:text-white">
+                                        <span class="text-lg text-gray-900 font-light lg:text-xl dark:text-white">
                                           {{ (item?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: item?.pricing?.currency || 'EUR' }) }}
                                         </span>
                                       </div>

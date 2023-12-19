@@ -8,10 +8,7 @@ const color = useColorMode()
 const route = useRoute()
 const router = useRouter()
 
-const currentRoutePath = ref([route.path])
-router.afterEach((value) => {
-  currentRoutePath.value = [value.path]
-})
+const currentRoutePath = computed(() => [route.path])
 
 useHead({
   meta: [{
@@ -69,16 +66,16 @@ const handle = ref<HTMLElement | null>(null)
         </span>
       </a>
       <div class="mb-2 h-full max-h-full w-full flex flex-1 justify-center overflow-hidden overflow-y-auto">
-        <a-menu :default-selected-keys="['2']" class="[&_.arco-icon]:h-1.25em [&_.arco-icon]:w-1.25em [&_.arco-menu-inner]:h-auto">
-          <a-menu-item key="1" @click="async() => await $router.push('/')">
+        <a-menu :default-selected-keys="currentRoutePath" class="[&_.arco-icon]:h-1.25em [&_.arco-icon]:w-1.25em [&_.arco-menu-inner]:h-auto">
+          <a-menu-item key="/" @click="async() => await $router.push('/')">
             <span class="i-carbon-home arco-icon mx-0 inline-block text-sm" />
             Séjours
           </a-menu-item>
-          <a-menu-item key="2" @click="async() => await $router.push('/search')">
+          <a-menu-item key="/search" @click="async() => await $router.push('/search')">
             <span class="arco-icon i-carbon-search mx-0 inline-block text-sm" />
             Recherche
           </a-menu-item>
-          <a-menu-item key="3" @click="async() => await $router.push('/search/calendar')">
+          <a-menu-item key="/calendar" @click="async() => await $router.push('/calendar')">
             <span class="arco-icon i-carbon-calendar-heat-map mx-0 inline-block text-sm" />
             Activités
           </a-menu-item>
