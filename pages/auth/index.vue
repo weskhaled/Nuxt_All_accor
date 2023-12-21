@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { loggedIn, user, session, clear } = useUserSession()
+// const { loggedIn, user, session } = useUserSession()
 
 definePageMeta({
   layout: 'auth',
@@ -16,16 +16,6 @@ const loginForm = reactive({
   username: 'weskhaled',
   password: 'Pa55w0rd',
   rememberMe: false,
-})
-
-onMounted(async () => {
-  if (loggedIn.value) {
-    const data = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList')
-    console.log('list', data)
-  }
-
-  console.log('mounted', user.value)
-  console.log('mounted', session.value)
 })
 </script>
 

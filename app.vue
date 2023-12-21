@@ -12,16 +12,13 @@ const localeProvider = computed(() => {
   return locales['fr-FR'] || enUS
 })
 
-// watch(userLang, async (val) => {
-//   val && availableLocales.includes(val) && (await loadLanguageAsync(val))
-// })
 useHead({
   title: appName,
 })
 </script>
 
 <template>
-  <!-- <VitePwaManifest /> -->
+  <VitePwaManifest />
   <a-config-provider :locale="localeProvider">
     <NuxtLayout>
       <NuxtPage />

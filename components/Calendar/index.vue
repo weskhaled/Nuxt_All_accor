@@ -300,12 +300,6 @@ onMounted(async () => {
             v-bind="wrapperProps" id="days-per-year"
             class="relative min-h-0 min-w-0 before-z-4 !h-auto"
           >
-            <!-- time-indicator
-            <span
-              class="time-indicator pointer-events-none absolute z-70 block h-1px w-full bg-green/45"
-              :style="{ top: `${timeIndicatorTop}px` }"
-            />
-            -->
             <!-- sticky left indicator -->
             <div class="sticky left-0 z-99 h-full flex-none select-none">
               <div class="time-fixed-side relative left-0 z-10 mt-8 min-w-45px w-45px flex flex-col text-3">
@@ -401,14 +395,7 @@ onMounted(async () => {
                     >
                       <template #content>
                         <div class="h-full flex flex-col justify-between pb-1">
-                          <h4>
-                            {{ event.start }}
-                          </h4>
-                          <a-button
-                            size="mini" type="primary" class="mt-1"
-                          >
-                            Edit
-                          </a-button>
+                          <p v-html="event.description || event.location || event.organizer?.email || event.title" />
                         </div>
                       </template>
                     </Event>
@@ -432,7 +419,7 @@ onMounted(async () => {
     @apply absolute top-0 w-full h-full;
 
     .event {
-      @apply absolute group left-0 min-h-max w-full flex-1 pb-2px text-white;
+      @apply absolute group left-0 min-h-max w-full flex-1 text-white;
       &.in--move, &.in--resize {
         @apply opacity-75 origin-top-right scale-100 z-45;
         div > * {

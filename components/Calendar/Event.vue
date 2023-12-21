@@ -24,22 +24,15 @@ export interface Props {
   <div draggable="false">
     <div class="h-full flex flex-col">
       <div v-if="dayjs(event.start).day() === date?.day()" class="h-full flex flex-col overflow-hidden">
-        <div class="event-header mb-1 bg-black/20">
+        <div class="event-header relative mb-0 truncate border-b border-black/25 bg-black/30 pl-1 pr-5 text-4.3/7">
           <slot name="title">
-            <h4 class="relative truncate pl-1 pr-6 text-4.2/7">
+            <h4 class="truncate text-3.8/7">
               {{ event.title }}
             </h4>
           </slot>
         </div>
-        <div class="event-content flex-1 overflow-auto p-x-1 text-4">
-          <slot name="content">
-            <div>
-              {{ event.start }}
-            </div>
-            <div>
-              {{ event.end }}
-            </div>
-          </slot>
+        <div class="event-content flex-1 overflow-auto bg-[--vp-c-brand-1] p-x-1 pb-2px text-3.8/5 transition-background-color-5500">
+          <slot name="content" />
         </div>
         <div
           class="hover:bg-slate-3-3 event-dragger absolute right-0 top-0 h-7 w-full flex cursor-grab items-center rounded-bl-2px bg-slate-8/5 transition-all delay-0s group-focus:cursor-grabbing active:bg-slate-8/30"
@@ -63,7 +56,7 @@ export interface Props {
         class="absolute bottom-0 h-1 w-full flex cursor-s-resize items-center bg-slate-2/50 transition-all delay-0.3s active:bg-slate-3 hover:bg-slate-3"
         @mousedown="(e) => $emit('mouseDownHandlerEventResize', e)"
       >
-        <span i-carbon-subtract class="mx-auto h-2 w-4 !text-dark-5" />
+        <span i-carbon-subtract class="mx-auto h-3 w-4 !text-dark-5" />
       </div>
     </div>
   </div>
