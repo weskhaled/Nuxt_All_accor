@@ -99,7 +99,7 @@ watchDebounced(
   <client-only>
     <!-- loading state via #fallback slot -->
     <div v-if="hotelDetails && modelValue" class="relative h-auto w-full flex flex-col pb-18 delay-200 md:pb-0" :class="[!modelValue ? '!hidden !invisible delay-200' : '!visible delay-200']">
-      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px border-bluegray-5/10 bg-light-1/85 p-2 shadow-bluegray/5 shadow-sm backdrop-blur backdrop-filter dark:bg-dark-9/85">
+      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px bg-light-1/85 p-2 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:border-dark-9 dark:bg-dark-9/85">
         <a-button
           shape="circle" size="small"
           class="m-0 inline-block flex-none !h-6 !w-6 !border-1px !border-blue"

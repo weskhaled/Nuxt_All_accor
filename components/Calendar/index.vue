@@ -191,7 +191,7 @@ watchThrottled(
       return
 
     const itemsInView = breakpoints['2xl'].value ? 4 : (breakpoints.xl.value ? 3 : (breakpoints.lg.value ? 2 : 1))
-    const containerWidth = (widthMonthListRef.value - 180)
+    const containerWidth = (widthMonthListRef.value - 120)
     const monthWidth = containerWidth / itemsInView
     const x = (monthWidth * month) - (containerWidth / itemsInView)
     xMonthListRef.value = x < 0 ? 0 : (x > monthWidth * 12 ? monthWidth * 12 : x)
@@ -224,18 +224,18 @@ onMounted(async () => {
         class="z-9 h-16 w-full flex flex-nowrap select-none items-center overflow-auto overflow-y-hidden text-center space-x-0"
       >
         <div
-          class="sticky left-0 z-22 h-full min-w-45 border-r-1px border-zinc-3/20 bg-slate-2/30 px-1 backdrop-blur dark:border-zinc-6/20 dark:bg-slate-8/30"
+          class="sticky left-0 z-22 h-full min-w-30 border-r-1px border-zinc-3/20 bg-slate-2/30 px-1 backdrop-blur dark:border-zinc-6/20 dark:bg-slate-8/30"
         >
           <a-date-picker v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD">
-            <h3 role="button" class="grid mx-auto h-full items-center px-2 text-sm/12 font-semibold capitalize">
-              {{ dayjs(selectedDate).format('DD MMMM, YYYY') }}
+            <h3 role="button" class="grid mx-auto h-full items-center text-sm/12 font-semibold capitalize">
+              {{ dayjs(selectedDate).format('DD/MM/YYYY') }}
             </h3>
           </a-date-picker>
         </div>
         <div class="h-full w-full flex flex-none flex-row flex-nowrap px-0">
           <div
             v-for="month in Array.from({ length: 12 }, (_, i) => i)" :key="month" role="button"
-            class="group min-w-95 flex-none basis-[calc((calc(100%-11.25rem)/1))] px-0 transition-all-200 2xl:basis-[calc((calc(100%-11.25rem)/4))] lg:basis-[calc((calc(100%-11.25rem)/2))] xl:basis-[calc((calc(100%-11.25rem)/3))] hover:bg-blue-5/15 first:pl-2 last:pr-2"
+            class="group min-w-95 flex-none basis-[calc((calc(100%-7.5rem)/1))] px-0 transition-all-200 2xl:basis-[calc((calc(100%-7.5rem)/4))] lg:basis-[calc((calc(100%-7.5rem)/2))] xl:basis-[calc((calc(100%-7.5rem)/3))] hover:bg-blue-5/15 first:pl-2 last:pr-2"
             :class="{
               'bg-blue-4/15 month--active': dayjs().set('month', month).isSame(dayjs(selectedDate), 'month'),
             }"
@@ -261,25 +261,27 @@ onMounted(async () => {
                   class="absolute bottom-3 z-5 w-full flex justify-between before:pointer-events-none before:absolute before:top-7px before:h-3px before:w-full before:bg-gray-4/20 before:content-[''] group-first:before:rounded-l-2px group-last:before:rounded-r-2px"
                 >
                   <template v-for="day in dayjs(new Date(dayjs(selectedDate).year(), month + 1, 0)).date()" :key="day">
-                    <a-tooltip
-                      :content="`${dayjs(new Date(dayjs(selectedDate).year(), month, day)).format('DD')}`"
-                      position="top" mini
+                    <span
+                      role="button"
+                      class="group/slider tooltip relative z-6 h-16px w-full flex cursor-pointer items-center justify-center"
+                      @click="scrollToEvent(day, month, dayjs(selectedDate).year())"
                     >
                       <span
-                        role="button"
-                        class="group/slider relative z-6 h-16px w-full flex cursor-pointer items-center justify-center"
-                        @click="scrollToEvent(day, month, dayjs(selectedDate).year())"
-                      >
-                        <span
-                          class="block h-7px w-7px rounded-0 rounded-full !m-auto group-hover/slider:bg-blue-5"
-                          :class="{
-                            '!bg-blue-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(selectedDate), 'date'),
-                            'bg-green-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(), 'date'),
-                            'bg-gray-4/25': events.some(ev => dayjs(new Date(dayjs(selectedDate).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')),
-                          }"
-                        />
+                        class="relative block h-7px w-7px rounded-0 rounded-full before:(absolute right-2px top-2px h-3px w-3px rounded-full bg-black/15 dark:bg-white/15) !m-auto group-hover/slider:bg-blue-5 before-content-['']"
+                        :class="{
+                          '!bg-blue-5 scale-120': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(selectedDate), 'date'),
+                          'bg-green-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(), 'date'),
+                          'bg-dark-1/45 dark:bg-light-1/45': events.some(ev => dayjs(new Date(dayjs(selectedDate).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')),
+                        }"
+                      />
+                      <span class="tooltip-content">
+                        <span class="tooltip-text">
+                          <span class="tooltip-inner">
+                            {{ dayjs().set('year', dayjs(selectedDate).year()).set('month', month).set('date', day).format('DD') }}
+                          </span>
+                        </span>
                       </span>
-                    </a-tooltip>
+                    </span>
                   </template>
                 </div>
               </div>
@@ -298,11 +300,12 @@ onMounted(async () => {
             v-bind="wrapperProps" id="days-per-year"
             class="relative min-h-0 min-w-0 before-z-4 !h-auto"
           >
-            <!-- time-indicator -->
+            <!-- time-indicator
             <span
               class="time-indicator pointer-events-none absolute z-70 block h-1px w-full bg-green/45"
               :style="{ top: `${timeIndicatorTop}px` }"
             />
+            -->
             <!-- sticky left indicator -->
             <div class="sticky left-0 z-99 h-full flex-none select-none">
               <div class="time-fixed-side relative left-0 z-10 mt-8 min-w-45px w-45px flex flex-col text-3">
@@ -322,11 +325,17 @@ onMounted(async () => {
               </div>
             </div>
             <div
-              v-for="item in list" :id="`${item.index + 1}`" :key="item.index" class="day flex-none !w-280px"
+              v-for="item in list" :id="`${item.index + 1}`" :key="item.index" class="day relative flex-none !w-280px"
               :class="{
                 'bg-blue-5/5': dayjs().isSame(item.data.date, 'date'),
               }"
             >
+              <!-- time-indicator -->
+              <span
+                v-if="dayjs().isSame(item.data.date, 'date')"
+                class="time-indicator pointer-events-none absolute z-70 block h-1px w-full bg-red/65"
+                :style="{ top: `${timeIndicatorTop}px` }"
+              />
               <div class="relative h-auto w-full">
                 <div class="flex-0 sticky top-0 z-80 select-none px-0 uppercase">
                   <div
@@ -416,12 +425,14 @@ onMounted(async () => {
 
 <style lang="less">
 .calendar--container {
+  .time-indicator {
+    @apply before-content-[''] before-absolute before-left-0 before-rounded-full before-top--3px before-h-7px before-w-7px before-bg-red;
+  }
   .events-card {
     @apply absolute top-0 w-full h-full;
 
     .event {
       @apply absolute group left-0 min-h-max w-full flex-1 pb-2px text-white;
-
       &.in--move, &.in--resize {
         @apply opacity-75 origin-top-right scale-100 z-45;
         div > * {
@@ -483,5 +494,48 @@ onMounted(async () => {
 
     }
   }
+}
+
+.tooltip {
+    @apply relative overflow-visible;
+
+    >.tooltip-content {
+        @apply after-content-[''] bg-transparent pointer-events-none absolute z-99 min-w-7 w-auto text-white opacity-0 cursor-default transition-opacity duration-200 delay-0.2s mr-0 mt-0 mb-0.5 bottom-full after:h-0 after:w-0 after:absolute after:pointer-events-none after:ml--5px after:border-t-white after:border-solid after:border-transparent after:border-5px after:left-1/2 after:-bottom-10px;
+
+        span {
+            @apply block;
+        }
+
+        .tooltip-text {
+            @apply overflow-hidden border-b-2px border-white;
+            transform: scale3d(0, 1, 1);
+            transition: transform 0.2s 0.2s;
+
+            .tooltip-inner {
+                @apply max-w-inherit text-center text-sm transition-transform duration-200 p-x0.5 rounded-none bg-black/90;
+                transform: translate3d(0, 100%, 0);
+
+                img {
+                    opacity: .65;
+                }
+            }
+        }
+    }
+
+    &:hover {
+        .tooltip-content {
+            @apply opacity-100 z-99 delay-0;
+
+            .tooltip-text {
+                @apply delay-0;
+                transform: scale3d(1, 1, 1);
+
+                .tooltip-inner {
+                    @apply transition-delay-0.2s;
+                    transform: translate3d(0, 0, 0);
+                }
+            }
+        }
+    }
 }
 </style>

@@ -6,7 +6,6 @@ export default oauth.googleEventHandler({
       },
       loggedInAt: Date.now(),
     })
-
     return sendRedirect(event, '/')
   },
 })

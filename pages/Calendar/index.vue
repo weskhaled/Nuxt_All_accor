@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { v4 as uuid } from 'uuid'
-import { useStorage } from '@vueuse/core'
 
 const { dayjs } = useDayjs()
 
 definePageMeta({
   layout: 'main',
+  // middleware: ['auth'],
 })
 
 const events = ref([

@@ -21,17 +21,12 @@ export interface Props {
 </script>
 
 <template>
-  <div
-    draggable="false"
-  >
+  <div draggable="false">
     <div class="h-full flex flex-col">
-      <div
-        v-if="dayjs(event.start).day() === date?.day()"
-        class="h-full flex flex-col overflow-hidden"
-      >
+      <div v-if="dayjs(event.start).day() === date?.day()" class="h-full flex flex-col overflow-hidden">
         <div class="event-header mb-1 bg-black/20">
           <slot name="title">
-            <h4 class="truncate pl-1 pr-6 text-4.2/7">
+            <h4 class="relative truncate pl-1 pr-6 text-4.2/7">
               {{ event.title }}
             </h4>
           </slot>

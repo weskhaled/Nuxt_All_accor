@@ -1,7 +1,11 @@
 import process from 'node:process'
+import { createResolver } from 'nuxt/kit'
 import { vitePluginForArco } from '@arco-plugins/vite-vue'
 import { appDescription } from './constants/index'
+
 import { pwa } from './config/pwa'
+
+// const { resolve } = createResolver(import.meta.url)
 
 export default defineNuxtConfig({
   modules: [
@@ -27,6 +31,10 @@ export default defineNuxtConfig({
       google: {
         clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
         clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
+      },
+      session: {
+        name: 'nuxt-session',
+        password: process.env.NUXT_SESSION_PASSWORD,
       },
     },
   },
@@ -62,11 +70,11 @@ export default defineNuxtConfig({
       },
     },
 
-    prerender: {
-      crawlLinks: false,
-      routes: ['/'],
-      ignore: ['/search'],
-    },
+    // prerender: {
+    //   crawlLinks: false,
+    //   routes: ['/', '/auth', '/calendar'],
+    //   ignore: ['/search'],
+    // },
   },
 
   app: {
@@ -85,7 +93,7 @@ export default defineNuxtConfig({
     },
   },
 
-  pwa,
+  // pwa,
 
   devtools: {
     enabled: true,

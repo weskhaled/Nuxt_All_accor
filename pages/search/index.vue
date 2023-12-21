@@ -80,15 +80,13 @@ function sortHotelsBy(h: any, sortBy: string, order: string) {
 const options = computed<UseFuseOptions<any>>(() => ({
   fuseOptions: {
     keys: ['hotel.name'],
-    isCaseSensitive: false,
     includeScore: false,
     shouldSort: false,
     includeMatches: true,
     minMatchCharLength: 3,
-    threshold: 0,
     useExtendedSearch: true,
   },
-  resultLimit: false,
+  resultLimit: 0,
   matchAllWhenSearchEmpty: true,
 }))
 
@@ -100,7 +98,7 @@ const filteredItems = computed(() => {
   const sortedAvailableHotels = A.sortBy(hotels, h => sortHotelsBy(h, filters.sortBy, filters.sortOrder))
 
   return filters.showAllResult
-    ? [...sortedAvailableHotels, ...unavailableHotels.value]
+    ? [...sortedAvailableHotels, ...(searchHotelInput.value ? [] : unavailableHotels.value)]
     : availableHotels.value
 })
 
@@ -381,7 +379,7 @@ onMounted(async () => {
   <div class="h-full flex flex-col overflow-hidden">
     <div class="max-h-full flex flex-1 flex-col-reverse md:flex-row dark:text-white">
       <div
-        class="relative z-4 h-full w-2/2 flex flex-1 overflow-hidden border-bluegray-2 rounded-t-md 2xl:w-4/7 md:w-4/5 xl:w-5/7 xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
+        class="relative z-5 h-full w-2/2 flex flex-1 overflow-hidden border-bluegray-2 rounded-t-md 2xl:w-4/7 md:w-4/5 xl:w-5/7 xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
       >
         <!-- list hotels -->
         <div
@@ -425,14 +423,25 @@ onMounted(async () => {
                     {{ destinationRouteQuery }}
                   </span>
                 </h1>
-                <div class="flex-0 max-w-65 flex items-center ![--primary:rgb(255_170_255)] md:w-3/8 space-x-1">
-                  <a-button size="small" type="primary">
-                    Share
+                <div class="max-w-65 flex items-center ![--primary:rgb(255_170_255)] md:w-3/8 space-x-1">
+                  <a-button type="primary" long class="group !pl-0 !font-semibold" size="medium" status="success">
+                    <span class="hidden flex-1 lg:flex lg:px-2">
+                      Share
+                    </span>
+                    <span
+                      class="h-full w-12 flex items-center justify-center rounded-2px bg-dark-9/10 px-1 -mr-[calc(1rem-1px)]"
+                    >
+                      <span class="h-4 w-4 transition-all group-hover:scale-110%" i-carbon-share />
+                    </span>
                   </a-button>
-                  <a-button class="flex" size="small" long type="outline" status="danger">
-                    <span i-carbon-favorite class="md:mr-1" />
-                    <span class="hidden md:inline-block">
+                  <a-button type="primary" class="group !pl-0 !font-semibold" size="medium" status="danger">
+                    <span class="hidden flex-1 lg:flex lg:px-2">
                       Save Search
+                    </span>
+                    <span
+                      class="h-full w-12 flex items-center justify-center rounded-2px bg-dark-9/10 px-1 -mr-[calc(1rem-1px)]"
+                    >
+                      <span class="h-4 w-4 transition-all group-hover:scale-110%" i-carbon-favorite />
                     </span>
                   </a-button>
                 </div>
@@ -441,7 +450,7 @@ onMounted(async () => {
                 <div class="flex items-center space-x-2">
                   <div class="max-w-70 flex-1">
                     <a-select
-                      v-model="filters.destination" class="w-full" :loading="loadingPlaces"
+                      v-model="filters.destination" class="w-full !font-semibold" :loading="loadingPlaces"
                       :options="optionsPlaces" placeholder="Please select ..." allow-search
                       @search="handleSearchPlaces"
                     />
@@ -449,18 +458,19 @@ onMounted(async () => {
                   <div class="flex-1">
                     <a-range-picker
                       v-model:model-value="filters.date" :allow-clear="false"
-                      :disabled-date="(current) => dayjs(current).isBefore(dayjs())" class="w-full"
+                      :disabled-date="(current) => dayjs(current).isBefore(dayjs())" class="w-full !font-semibold"
                     />
                   </div>
                   <div>
-                    <a-button
-                      type="primary" size="medium" class="flex items-center px-1.5"
-                      @click="() => visibleDrawer = true"
-                    >
-                      <span class="hidden lg:block">
+                    <a-button type="primary" class="group lg:min-w-45 !pl-0 !font-semibold" size="medium" @click="() => visibleDrawer = true">
+                      <span class="hidden flex-1 lg:flex lg:px-2">
                         Recherche avancée
                       </span>
-                      <span class="i-carbon-search-advanced h-5 w-5" />
+                      <span
+                        class="flex-0 h-full w-12 flex items-center justify-center rounded-2px bg-dark-9/10 px-1 -mr-[calc(1rem-1px)]"
+                      >
+                        <span class="h-4 w-4 transition-all group-hover:scale-110%" i-carbon-search />
+                      </span>
                     </a-button>
                   </div>
                 </div>
@@ -522,7 +532,7 @@ onMounted(async () => {
             <!-- hotel list -->
             <Suspense>
               <!-- component with nested async dependencies -->
-              <div class="mb-14.25 flex flex-1 bg-light-2/95 p-5px md:mb-0 dark:bg-dark-9/95">
+              <div class="mb-10.25 flex flex-1 bg-light-2/95 p-5px md:mb-0 dark:bg-dark-9/95">
                 <div class="relative w-full flex flex-1 flex-col">
                   <div v-if="isMounted && !loadingGetHotels && !errorGetHotels" v-bind="wrapperProps" class="h-full p-0">
                     <div class="list flex flex-col space-y-5px">
@@ -539,7 +549,7 @@ onMounted(async () => {
                     <a-spin />
                   </div>
                   <div
-                    v-if="!loadingGetHotels && (errorGetHotels || (!errorGetHotels && totalHotels === 0))"
+                    v-if="!loadingGetHotels && (!list.length || errorGetHotels || (!errorGetHotels && totalHotels === 0))"
                     class="top-0 h-full flex items-center justify-center"
                   >
                     <a-result
@@ -572,8 +582,9 @@ onMounted(async () => {
           </div>
         </div>
       </div>
+      <!-- google maps -->
       <div
-        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex overflow-hidden p-0 transition-all md:h-full md:p-0"
+        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-0 transition-all md:h-full md:p-0"
         :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
       >
         <div

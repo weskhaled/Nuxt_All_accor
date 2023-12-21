@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { UseDraggable as Draggable } from '@vueuse/components'
-import { mdAndSmaller, sideFixed, smAndSmaller } from '~/common/stores/index'
+import { mdAndSmaller } from '~/common/stores/index'
 
 // import { promiseTimeout } from '@vueuse/core'
 
+const { user, loggedIn, clear } = useUserSession()
 const color = useColorMode()
 const route = useRoute()
 const router = useRouter()
+const currentRoutePath = ref([route.path])
 
-const currentRoutePath = computed(() => [route.path])
+router.afterEach((to) => {
+  currentRoutePath.value = [to.path]
+})
 
 useHead({
   meta: [{
@@ -45,6 +49,21 @@ const handle = ref<HTMLElement | null>(null)
 
 <template>
   <a-layout class="relative h-[calc(100vh-2.25rem)] min-h-screen flex font-sans !flex-row">
+    <!-- <div class="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center overflow-hidden opacity-45">
+      <div class="min-w-60rem w-100% flex flex-none justify-end">
+        <picture class="">
+          <source
+            srcset="https://tailwindcss.com/_next/static/media/docs@30.8b9a76a2.avif" type="image/avif" class="" style="
+"
+          >
+          <img src="https://tailwindcss.com/_next/static/media/docs@tinypng.d9e4dcdc.png" alt="" class="max-w-none w-[71.75rem] flex-none dark:hidden" decoding="async">
+        </picture>
+        <picture>
+          <source srcset="https://tailwindcss.com/_next/static/media/docs-dark@30.1a9f8cbf.avif" type="image/avif">
+          <img src="https://tailwindcss.com/_next/static/media/docs-dark@tinypng.1bbe175e.png" alt="" class="hidden max-w-none w-[90rem] flex-none dark:block" decoding="async">
+        </picture>
+      </div>
+    </div> -->
     <a-layout-sider
       hide-trigger collapsible :collapsed-width="60" :theme="isDark ? 'dark' : 'light'" :collapsed="true"
       class="layout-sidebar"
@@ -66,7 +85,7 @@ const handle = ref<HTMLElement | null>(null)
         </span>
       </a>
       <div class="mb-2 h-full max-h-full w-full flex flex-1 justify-center overflow-hidden overflow-y-auto">
-        <a-menu :default-selected-keys="currentRoutePath" class="[&_.arco-icon]:h-1.25em [&_.arco-icon]:w-1.25em [&_.arco-menu-inner]:h-auto">
+        <a-menu :default-selected-keys="currentRoutePath" :selected-keys="currentRoutePath" class="[&_.arco-icon]:h-1.25em [&_.arco-icon]:w-1.25em [&_.arco-menu-inner]:h-auto">
           <a-menu-item key="/" @click="async() => await $router.push('/')">
             <span class="i-carbon-home arco-icon mx-0 inline-block text-sm" />
             Séjours
@@ -126,9 +145,14 @@ const handle = ref<HTMLElement | null>(null)
         class="flex-0 mb-12 flex flex-col items-center space-y-4 [&_.arco-btn>.arco-btn-icon>span]:text-dark dark:[&_.arco-btn>.arco-btn-icon>span]:text-light"
       >
         <a-tooltip content="Mon compte et mes points" position="tr" mini>
-          <a-button shape="circle" class="" type="text" @click="async() => await $router.push('/auth')">
-            <template #icon>
-              <span class="i-carbon-user-avatar block h-5 w-5 text-sm" />
+          <a-button shape="circle" class="h-full flex items-center justify-center" type="text" @click="async() => await $router.push('/auth')">
+            <span v-if="!loggedIn" class="i-carbon-user-avatar block h-6 w-6" />
+            <template v-else>
+              <img
+                :src="user.google.picture"
+                :alt="user.google.name"
+                class="block h-full w-full rounded-full"
+              >
             </template>
           </a-button>
         </a-tooltip>
@@ -178,12 +202,19 @@ const handle = ref<HTMLElement | null>(null)
         class="relative z-15 mx-auto w-auto flex items-center border border-slate-2/55 rounded-0 bg-slate-1/85 py-1 text-slate-500 backdrop-blur backdrop-filter dark:border-slate-9/55 dark:bg-black/85 dark:text-slate-200"
       >
         <div class="flex flex-auto items-center justify-evenly">
-          <a-button shape="circle" class="block !h-11 !w-11" type="text" aria-label="FavoriteList">
+          <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="FavoriteList">
             <template #icon>
-              <span i-carbon-user-avatar class="" />
+              <span v-if="!loggedIn" i-carbon-user-avatar class="i-carbon-user-avatar block h-5 w-5 text-sm" />
+              <template v-else>
+                <img
+                  :src="user.google.picture"
+                  :alt="user.google.name"
+                  class="mr-1 inline-block h-5 w-5 rounded-full text-sm"
+                >
+              </template>
             </template>
           </a-button>
-          <a-button shape="circle" class="block !h-11 !w-11" type="text" aria-label="Previous">
+          <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="Previous">
             <template #icon>
               <span i-carbon-undo class="" />
             </template>
@@ -191,19 +222,19 @@ const handle = ref<HTMLElement | null>(null)
         </div>
         <a-button
           long
-          class="mx-auto mb-0 flex flex-none items-center justify-center rounded-full shadow-sm ring-1 ring-slate-900/5 -my-4 !h-16 !w-16 dark:text-slate-1 lg:-my-3 lg:!h-18 lg:!w-18"
+          class="mx-auto mb-0 flex flex-none items-center justify-center rounded-full shadow-sm ring-1 ring-slate-900/5 -my-3 !h-12 !w-12 dark:text-slate-1"
           type="primary" shape="circle" @click="async () => await $router.push('/')"
         >
           <span i-carbon-home class="text-2xl" />
         </a-button>
         <div class="flex flex-auto items-center justify-evenly">
-          <a-button shape="circle" class="block xl:block !h-11 !w-11" type="text" aria-label="Next">
+          <a-button shape="circle" class="block xl:block !h-9 !w-9" type="text" aria-label="Next">
             <template #icon>
               <span i-carbon-redo class="" />
             </template>
           </a-button>
           <a-tooltip content="Toggle Dark mode" position="tr" mini>
-            <a-button shape="circle" class="block !h-11 !w-11" type="text" @click="toggleDark()">
+            <a-button shape="circle" class="block !h-9 !w-9" type="text" @click="toggleDark()">
               <template #icon>
                 <span class="i-carbon-sun dark:i-carbon-moon block h-5 w-5 text-sm" />
               </template>

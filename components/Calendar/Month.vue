@@ -65,16 +65,26 @@ const selectedMonth = computed(() => {
             showSelectedMonth === month.month.month() ? 'w-full h-full' : (showSelectedMonth > -1 && '!hidden'),
           ]"
         >
-          <div class="month-header flex-none bg-light/35 dark:bg-dark/35">
-            <h4
-              class="mb-1 text-center font-bold tracking-wide capitalize"
-              :class="[
-                showSelectedMonth === month.month.month() ? 'text-6.5/9' : 'text-4.6/8',
-              ]"
+          <div
+            class="month-header flex flex-none items-center justify-center bg-light/35 px-2 text-center font-semibold tracking-wide capitalize dark:bg-dark/35"
+            :class="[
+              showSelectedMonth === month.month.month() ? 'text-6.4/10' : 'text-4.6/8',
+            ]"
+          >
+            <a
+              href="javascript:;"
+              class=""
               @click="showSelectedMonth === -1 ? (showSelectedMonth = month.month.month()) : showSelectedMonth = -1"
             >
               {{ month.month.format('MMMM') }}
-            </h4>
+            </a>
+            <a
+              v-if="showSelectedMonth > -1"
+              href="javascript:;"
+              @click="showSelectedMonth = -1"
+            >
+              ,&nbsp;{{ month.month.format('YYYY') }}
+            </a>
           </div>
           <div class="flex flex-1 flex-col p0">
             <div class="flex border-b border-gray-5/10 text-center text-dark-9/70 font-semibold dark:border-gray-8/30 dark:text-blue-1/80">
@@ -94,17 +104,43 @@ const selectedMonth = computed(() => {
             <div class="isolate grid grid-cols-7 grid-rows-6 h-full w-full gap-0px text-center font-mono [&>div:nth-child(7n)]:border-r-0 [&>div:nth-child(n+36)]:border-b-0">
               <template v-for="(day, index) in month.days" :key="index">
                 <div
-                  class="min-h-full min-w-7 w-full flex items-center justify-center overflow-hidden border-b border-r border-gray-5/10 dark:border-gray-8/30"
+                  class="min-h-7 min-w-7 w-full flex items-center justify-center overflow-hidden border-b border-r border-gray-5/10 dark:border-gray-8/30"
                 >
-                  <div class="h-full w-full flex items-center justify-center">
-                    <span
+                  <div
+                    class="h-full w-full flex"
+                    :class="[showSelectedMonth > -1 ? 'justify-between p-0.5 flex-col' : 'items-center justify-center']"
+                  >
+                    <time
+                      :datetime="day.date.format('YYYY-MM-DD')"
                       :role="day.inSameMonth && 'button'"
                       class="h-6 w-6 flex items-center justify-center border-sky-4 rounded-full transition-all"
                       :class="[day.inSameMonth ? 'opacity-100 hover:bg-sky/60' : 'opacity-20 select-none', day.inSameMonth && (((day.isSelected || day.isToday) && 'font-semibold') && (day.isToday && 'border border-sky/90' || day.isSelected && 'bg-sky/90'))]"
                       @click="day.inSameMonth && (modelValue = day.date.format('YYYY-MM-DD'))"
                     >
                       {{ day.date.format('DD') }}
-                    </span>
+                    </time>
+                    <template v-if="showSelectedMonth > -1 && day.events.length > 0">
+                      <ol class="mt-0.5 text-left">
+                        <li v-for="event in day.events.slice(0, 4)" :key="event.id">
+                          <a href="javascript:;" class="group flex cursor-pointer" @click="$emit('eventClicked', event)">
+                            <p class="flex-auto truncate text-gray-4 font-medium group-hover:text-sky-4">
+                              {{ event.title }}
+                            </p>
+                            <time
+                              :datetime="event.start"
+                              class="ml-3 hidden flex-none text-gray-500 xl:block group-hover:text-sky-4"
+                            >
+                              {{ dayjs(event.start).format('HH:mm') }}</time>
+                          </a>
+                        </li>
+                        <li v-if="day.events.length > 4" class="text-gray-500">
+                          + {{ day.events.length - 4 }}
+                          <span class="ml-1">
+                            more
+                          </span>
+                        </li>
+                      </ol>
+                    </template>
                   </div>
                 </div>
               </template>

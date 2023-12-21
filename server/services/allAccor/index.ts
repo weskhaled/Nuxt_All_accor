@@ -60,10 +60,10 @@ export async function getHotels(filters?: any) {
       Apikey: `${API_ACCOR_API_KEY}`,
     },
     body: {
-      adults: filters.compositions.adults,
+      adults: filters.compositions.adults || 1,
       childrenAges: filters.compositions.childrenAges || [],
-      dateIn: filters.dateIn,
-      nights: filters.nights,
+      dateIn: filters.dateIn || new Date().toISOString().split('T')[0],
+      nights: filters.nights || 1,
       hotelCode: results.map(r => r.hotel?.id),
     },
   }).catch((error) => {

@@ -44,7 +44,7 @@ export const pwa: ModuleOptions = {
     maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
     runtimeCaching: [
       {
-        urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.match(/^\/search?\/.*/i),
+        urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.match(/^\/search\/.*/i),
         handler: 'NetworkOnly',
         options: {
           matchOptions: {
