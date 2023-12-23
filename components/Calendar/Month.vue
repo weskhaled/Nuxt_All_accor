@@ -68,7 +68,7 @@ const selectedMonth = computed(() => {
           <div
             class="month-header flex flex-none items-center justify-center bg-light/35 px-2 text-center font-semibold tracking-wide capitalize dark:bg-dark/35"
             :class="[
-              showSelectedMonth === month.month.month() ? 'text-6.4/10' : 'text-4.6/8',
+              showSelectedMonth === month.month.month() ? 'text-5.3/10' : 'text-3.9/7',
             ]"
           >
             <a

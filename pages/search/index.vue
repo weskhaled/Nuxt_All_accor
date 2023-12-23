@@ -423,8 +423,8 @@ onMounted(async () => {
                     {{ destinationRouteQuery }}
                   </span>
                 </h1>
-                <div class="max-w-65 flex items-center ![--primary:rgb(255_170_255)] md:w-3/8 space-x-1">
-                  <a-button type="primary" long class="group !pl-0 !font-semibold" size="medium" status="success">
+                <div class="max-w-65 flex items-center md:w-3/8 space-x-1">
+                  <a-button type="secondary" long class="group !pl-0 !font-semibold" size="medium" status="success">
                     <span class="hidden flex-1 lg:flex lg:px-2">
                       Share
                     </span>
@@ -434,7 +434,7 @@ onMounted(async () => {
                       <span class="h-4 w-4 transition-all group-hover:scale-110%" i-carbon-share />
                     </span>
                   </a-button>
-                  <a-button type="primary" class="group !pl-0 !font-semibold" size="medium" status="danger">
+                  <a-button type="secondary" class="group !pl-0 !font-semibold" size="medium" status="danger">
                     <span class="hidden flex-1 lg:flex lg:px-2">
                       Save Search
                     </span>

@@ -196,53 +196,53 @@ const handle = ref<HTMLElement | null>(null)
         </Suspense>
       </a-layout-content>
       <LayoutFooter class="flex-0" />
-    </a-layout>
-    <div class="fixed bottom-0 z-5 w-full px-0 md:hidden">
-      <div
-        class="relative z-15 mx-auto w-auto flex items-center border border-slate-2/55 rounded-0 bg-slate-1/85 py-1 text-slate-500 backdrop-blur backdrop-filter dark:border-slate-9/55 dark:bg-black/85 dark:text-slate-200"
-      >
-        <div class="flex flex-auto items-center justify-evenly">
-          <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="FavoriteList">
-            <template #icon>
-              <span v-if="!loggedIn" i-carbon-user-avatar class="i-carbon-user-avatar block h-5 w-5 text-sm" />
-              <template v-else>
-                <img
-                  :src="user.google.picture"
-                  :alt="user.google.name"
-                  class="mr-1 inline-block h-5 w-5 rounded-full text-sm"
-                >
-              </template>
-            </template>
-          </a-button>
-          <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="Previous">
-            <template #icon>
-              <span i-carbon-undo class="" />
-            </template>
-          </a-button>
-        </div>
-        <a-button
-          long
-          class="mx-auto mb-0 flex flex-none items-center justify-center rounded-full shadow-sm ring-1 ring-slate-900/5 -my-3 !h-12 !w-12 dark:text-slate-1"
-          type="primary" shape="circle" @click="async () => await $router.push('/')"
+      <div class="bottom-0 z-5 w-full px-0 md:hidden">
+        <div
+          class="relative z-15 mx-auto w-auto flex items-center border border-slate-2/55 rounded-0 bg-slate-1/85 py-1 text-slate-500 backdrop-blur backdrop-filter dark:border-slate-9/55 dark:bg-black/85 dark:text-slate-200"
         >
-          <span i-carbon-home class="text-2xl" />
-        </a-button>
-        <div class="flex flex-auto items-center justify-evenly">
-          <a-button shape="circle" class="block xl:block !h-9 !w-9" type="text" aria-label="Next">
-            <template #icon>
-              <span i-carbon-redo class="" />
-            </template>
-          </a-button>
-          <a-tooltip content="Toggle Dark mode" position="tr" mini>
-            <a-button shape="circle" class="block !h-9 !w-9" type="text" @click="toggleDark()">
+          <div class="flex flex-auto items-center justify-evenly">
+            <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="FavoriteList">
               <template #icon>
-                <span class="i-carbon-sun dark:i-carbon-moon block h-5 w-5 text-sm" />
+                <span v-if="!loggedIn" i-carbon-user-avatar class="i-carbon-user-avatar block h-5 w-5 text-sm" />
+                <template v-else>
+                  <img
+                    :src="user.google.picture"
+                    :alt="user.google.name"
+                    class="mr-1 inline-block h-5 w-5 rounded-full text-sm"
+                  >
+                </template>
               </template>
             </a-button>
-          </a-tooltip>
+            <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="Previous">
+              <template #icon>
+                <span i-carbon-undo class="" />
+              </template>
+            </a-button>
+          </div>
+          <a-button
+            long
+            class="mx-auto mb-0 flex flex-none items-center justify-center rounded-full shadow-sm ring-1 ring-slate-900/5 -my-3 !h-12 !w-12 dark:text-slate-1"
+            type="primary" shape="circle" @click="async () => await $router.push('/')"
+          >
+            <span i-carbon-home class="text-2xl" />
+          </a-button>
+          <div class="flex flex-auto items-center justify-evenly">
+            <a-button shape="circle" class="block xl:block !h-9 !w-9" type="text" aria-label="Next">
+              <template #icon>
+                <span i-carbon-redo class="" />
+              </template>
+            </a-button>
+            <a-tooltip content="Toggle Dark mode" position="tr" mini>
+              <a-button shape="circle" class="block !h-9 !w-9" type="text" @click="toggleDark()">
+                <template #icon>
+                  <span class="i-carbon-sun dark:i-carbon-moon block h-5 w-5 text-sm" />
+                </template>
+              </a-button>
+            </a-tooltip>
+          </div>
         </div>
       </div>
-    </div>
+    </a-layout>
     <ClientOnly>
       <Draggable
         storage-key="vueuse-draggable" storage-type="session" class="fixed z-1001"

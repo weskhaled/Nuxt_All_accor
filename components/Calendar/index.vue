@@ -184,19 +184,22 @@ watch(selectedDate, (value) => {
   scrollTo(dayjs(value).dayOfYear() - 1)
 })
 
+function scrollToMonth(month: number) {
+  const itemsInView = breakpoints['2xl'].value ? 4 : (breakpoints.xl.value ? 3 : (breakpoints.lg.value ? 2 : 1))
+  const containerWidth = (widthMonthListRef.value - 120)
+  const monthWidth = containerWidth / itemsInView
+  const x = (monthWidth * (month)) - (containerWidth / itemsInView)
+  xMonthListRef.value = x < 0 ? 0 : (x > monthWidth * 12 ? monthWidth * 12 : x)
+}
+
 watchThrottled(
   () => list.value?.at(Math.round(list.value.length / 2))?.data?.date.month(),
   (month) => {
     if (month === undefined || !widthMonthListRef.value)
       return
-
-    const itemsInView = breakpoints['2xl'].value ? 4 : (breakpoints.xl.value ? 3 : (breakpoints.lg.value ? 2 : 1))
-    const containerWidth = (widthMonthListRef.value - 120)
-    const monthWidth = containerWidth / itemsInView
-    const x = (monthWidth * month) - (containerWidth / itemsInView)
-    xMonthListRef.value = x < 0 ? 0 : (x > monthWidth * 12 ? monthWidth * 12 : x)
+    scrollToMonth(month + 1)
   },
-  { throttle: 500 },
+  { throttle: 500, immediate: true },
 )
 
 function scrollToEvent(day: number, month: number, year = dayjs(selectedDate.value).year()) {
@@ -213,77 +216,78 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="z-2 h-full flex flex-1 flex-col snap-y snap-mandatory overflow-x-hidden">
+  <div class="relative z-2 h-screen flex flex-1 flex-col snap-y snap-mandatory overflow-x-hidden">
     <!-- grid months -->
-    <div id="grid-months" class="relative flex flex flex-none flex-col snap-start overflow-hidden bg-white/87 backdrop-blur dark:bg-black/87">
-      <div class="h-[calc(100vh-7.5rem)] overflow-hidden border-b-1px border-gray-4/15 md:h-[calc(100vh-6.5rem)]">
+    <div id="grid-months" class="relative h-[calc(100%-4rem)] flex flex flex-none flex-col snap-start overflow-hidden bg-white/87 backdrop-blur dark:bg-black/87">
+      <div class="h-full overflow-hidden border-b-1px border-gray-4/15">
         <CalendarMonth v-model="selectedDate" :events="events" @event-clicked="(eventData) => (scrollToEvent(dayjs(eventData.start).date(), dayjs(eventData.start).month()), routeHash = '#grid-events')" />
       </div>
+    </div>
+    <!-- month list -->
+    <div
+      ref="monthListRef"
+      class="z-9 min-h-16 w-full flex flex-nowrap select-none snap-start items-center overflow-auto overflow-y-hidden bg-white/75 text-center shadow-[inset_0_-2px_6px_rgba(0,0,0,0.05)] backdrop-blur space-x-0 dark:bg-black/75"
+    >
       <div
-        ref="monthListRef"
-        class="z-9 h-16 w-full flex flex-nowrap select-none items-center overflow-auto overflow-y-hidden text-center space-x-0"
+        class="sticky left-0 z-22 h-full min-w-30 border-r-1px border-zinc-3/20 bg-slate-2/30 px-1 backdrop-blur dark:border-zinc-6/20 dark:bg-slate-8/30"
       >
+        <a-date-picker v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD">
+          <h3 role="button" class="grid mx-auto h-full items-center text-sm/12 font-semibold capitalize">
+            {{ dayjs(selectedDate).format('DD/MM/YYYY') }}
+          </h3>
+        </a-date-picker>
+      </div>
+      <div class="h-full w-full flex flex-none flex-row flex-nowrap px-0">
         <div
-          class="sticky left-0 z-22 h-full min-w-30 border-r-1px border-zinc-3/20 bg-slate-2/30 px-1 backdrop-blur dark:border-zinc-6/20 dark:bg-slate-8/30"
+          v-for="month in Array.from({ length: 12 }, (_, i) => i)" :key="month" role="button"
+          class="group min-w-95 flex-none basis-[calc((calc(100%-7.5rem)/1))] px-0 transition-all-200 2xl:basis-[calc((calc(100%-7.5rem)/4))] lg:basis-[calc((calc(100%-7.5rem)/2))] xl:basis-[calc((calc(100%-7.5rem)/3))] hover:bg-blue-5/15 first:pl-2 last:pr-2"
+          :class="{
+            'bg-blue-4/15 month--active': dayjs().set('month', month).isSame(dayjs(selectedDate), 'month'),
+          }"
         >
-          <a-date-picker v-model="selectedDate" value-format="YYYY-MM-DD" format="YYYY-MM-DD">
-            <h3 role="button" class="grid mx-auto h-full items-center text-sm/12 font-semibold capitalize">
-              {{ dayjs(selectedDate).format('DD/MM/YYYY') }}
-            </h3>
-          </a-date-picker>
-        </div>
-        <div class="h-full w-full flex flex-none flex-row flex-nowrap px-0">
-          <div
-            v-for="month in Array.from({ length: 12 }, (_, i) => i)" :key="month" role="button"
-            class="group min-w-95 flex-none basis-[calc((calc(100%-7.5rem)/1))] px-0 transition-all-200 2xl:basis-[calc((calc(100%-7.5rem)/4))] lg:basis-[calc((calc(100%-7.5rem)/2))] xl:basis-[calc((calc(100%-7.5rem)/3))] hover:bg-blue-5/15 first:pl-2 last:pr-2"
-            :class="{
-              'bg-blue-4/15 month--active': dayjs().set('month', month).isSame(dayjs(selectedDate), 'month'),
-            }"
-          >
-            <div class="h-full w-full">
-              <div class="relative h-full w-full">
-                <div
-                  class="pt-2.5"
-                  @click="() => (selectedDate = dayjs(selectedDate).set('date', 1).set('month', month).format('YYYY-MM-DD'), routeHash = '#grid-months')"
+          <div class="h-full w-full">
+            <div class="relative h-full w-full">
+              <div
+                class="pt-2.5"
+                @click="() => (selectedDate = dayjs(selectedDate).set('date', 1).set('month', month).format('YYYY-MM-DD'), routeHash = '#grid-months')"
+              >
+                <a-badge
+                  class=""
+                  :count="events.filter(ev => dayjs(selectedDate).set('date', 1).set('month', month).isBetween(dayjs(ev.start), dayjs(ev.end), 'month', '[]')).length"
                 >
-                  <a-badge
-                    class=""
-                    :count="events.filter(ev => dayjs(selectedDate).set('date', 1).set('month', month).isBetween(dayjs(ev.start), dayjs(ev.end), 'month', '[]')).length"
+                  <span
+                    class="inline from-blue-5 to-sky-6 bg-gradient-to-r bg-clip-text text-7/5 text-transparent font-black tracking-0.6 capitalize opacity-40 transition-all !group-[.month--active]:opacity-90 dark:group-hover:opacity-80"
+                  >
+                    {{ dayjs().set('month', month).format('MMMM') }}
+                  </span>
+                </a-badge>
+              </div>
+              <div
+                class="absolute top-[calc(50%+3px)] z-5 h-10px w-full flex justify-between before:pointer-events-none before:absolute before:top-2px before:h-6px before:w-full before:bg-gray-4/20 before:content-[''] group-first:before:rounded-l-3px group-last:before:rounded-r-3px"
+              >
+                <template v-for="day in dayjs(new Date(dayjs(selectedDate).year(), month + 1, 0)).date()" :key="day">
+                  <span
+                    role="button"
+                    class="group/slider tooltip relative z-6 h-100% w-full flex cursor-pointer items-center justify-center"
+                    @click="scrollToEvent(day, month, dayjs(selectedDate).year())"
                   >
                     <span
-                      class="inline from-blue-5 to-sky-6 bg-gradient-to-r bg-clip-text text-7/5 text-transparent font-black tracking-0.6 capitalize opacity-40 transition-all !group-[.month--active]:opacity-90 dark:group-hover:opacity-80"
-                    >
-                      {{ dayjs().set('month', month).format('MMMM') }}
-                    </span>
-                  </a-badge>
-                </div>
-                <div
-                  class="absolute bottom-3 z-5 w-full flex justify-between before:pointer-events-none before:absolute before:top-7px before:h-3px before:w-full before:bg-gray-4/20 before:content-[''] group-first:before:rounded-l-2px group-last:before:rounded-r-2px"
-                >
-                  <template v-for="day in dayjs(new Date(dayjs(selectedDate).year(), month + 1, 0)).date()" :key="day">
-                    <span
-                      role="button"
-                      class="group/slider tooltip relative z-6 h-16px w-full flex cursor-pointer items-center justify-center"
-                      @click="scrollToEvent(day, month, dayjs(selectedDate).year())"
-                    >
-                      <span
-                        class="relative block h-7px w-7px rounded-0 rounded-full before:(absolute right-2px top-2px h-3px w-3px rounded-full bg-black/15 dark:bg-white/15) !m-auto group-hover/slider:bg-blue-5 before-content-['']"
-                        :class="{
-                          '!bg-blue-5 scale-120': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(selectedDate), 'date'),
-                          'bg-green-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(), 'date'),
-                          'bg-dark-1/45 dark:bg-light-1/45': events.some(ev => dayjs(new Date(dayjs(selectedDate).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')),
-                        }"
-                      />
-                      <span class="tooltip-content">
-                        <span class="tooltip-text">
-                          <span class="tooltip-inner">
-                            {{ dayjs().set('year', dayjs(selectedDate).year()).set('month', month).set('date', day).format('DD') }}
-                          </span>
+                      class="relative block h-6px w-6px rounded-0 rounded-full before:(absolute right-2px top-2px h-2px w-2px rounded-full bg-black/15 dark:bg-white/15) !m-auto group-hover/slider:bg-blue-5 before-content-['']"
+                      :class="{
+                        '!bg-blue-5 scale-120': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(selectedDate), 'date'),
+                        'bg-green-5': dayjs(new Date(dayjs(selectedDate).year(), month, day)).isSame(dayjs(), 'date'),
+                        'bg-dark-1/45 dark:bg-light-1/45': events.some(ev => dayjs(new Date(dayjs(selectedDate).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')),
+                      }"
+                    />
+                    <span class="tooltip-content">
+                      <span class="tooltip-text">
+                        <span class="tooltip-inner">
+                          {{ dayjs().set('year', dayjs(selectedDate).year()).set('month', month).set('date', day).format('DD') }}
                         </span>
                       </span>
                     </span>
-                  </template>
-                </div>
+                  </span>
+                </template>
               </div>
             </div>
           </div>
@@ -291,9 +295,9 @@ onMounted(async () => {
       </div>
     </div>
     <!-- grid events  -->
-    <div id="grid-events" class="relative flex flex-auto snap-start border-t-1px border-gray-4/25 bg-light-1 dark:bg-dark-9">
+    <div id="grid-events" class="relative h-[calc(100%-4rem)] flex flex-auto snap-start border-t-1px border-gray-4/25 bg-light-1/90 dark:bg-dark-9/90">
       <div
-        class="content-stretch relative ml-0 h-[calc(100vh-4rem)] min-h-92 flex flex-auto flex-nowrap items-stretch overflow-auto overflow-auto md:h-[calc(100vh-6.65rem)]"
+        class="content-stretch relative ml-0 mt-auto h-full min-h-92 flex flex-auto flex-nowrap items-stretch overflow-auto"
       >
         <div v-bind="containerProps" class="calendar--container z-8 h-full snap-none">
           <div
