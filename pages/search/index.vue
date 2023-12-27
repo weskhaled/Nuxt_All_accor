@@ -403,17 +403,17 @@ onMounted(async () => {
             >
               <div class="flex items-center justify-between space-x-2">
                 <h1 class="my-1 inline-block max-w-full flex-1 overflow-hidden truncate text-sm leading-7 md:text-xl">
-                  <span class="mr-1">
+                  <span class="mr-1 h-full inline-flex items-center justify-center">
                     <ClientOnly>
-                      <span v-if="loadingGetHotels">
-                        <a-spin
-                          class="h-5 w-5 [&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-4)"
-                        />
-                      </span>
+                      <a-spin
+                        v-if="loadingGetHotels"
+                        class="[&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-3)"
+                      />
                       <span v-else>{{ totalHotels }}</span>
-
                       <template #fallback>
-                        <a-spin />
+                        <a-spin
+                          class="[&_.arco-spin-icon]:(h-full w-full flex items-center justify-center text-3)"
+                        />
                       </template>
                     </ClientOnly>
                   </span>
@@ -469,7 +469,7 @@ onMounted(async () => {
                       <span
                         class="flex-0 h-full w-12 flex items-center justify-center rounded-2px bg-dark-9/10 px-1 -mr-[calc(1rem-1px)]"
                       >
-                        <span class="h-4 w-4 transition-all group-hover:scale-110%" i-carbon-search />
+                        <span class="h-4 w-4 transition-all group-hover:scale-100%" i-carbon-settings-adjust />
                       </span>
                     </a-button>
                   </div>
@@ -549,7 +549,7 @@ onMounted(async () => {
                     <a-spin />
                   </div>
                   <div
-                    v-if="!loadingGetHotels && (!list.length || errorGetHotels || (!errorGetHotels && totalHotels === 0))"
+                    v-if="isMounted && !loadingGetHotels && (!list.length || errorGetHotels || (!errorGetHotels && totalHotels === 0))"
                     class="top-0 h-full flex items-center justify-center"
                   >
                     <a-result
@@ -565,7 +565,7 @@ onMounted(async () => {
               </div>
               <!-- loading state via #fallback slot -->
               <template #fallback>
-                <div class="top-0 h-full flex items-center justify-center">
+                <div class="top-0 h-full w-full flex items-center justify-center">
                   <a-spin />
                 </div>
               </template>

@@ -23,6 +23,8 @@ const monthListRef = ref<HTMLElement | null>()
 const dragHandlerEventMoveRef = ref<EventTarget | null>()
 const selectedEvent = ref<any>(null)
 const timeIndicatorTop = ref<number>(0)
+const selectedEventForDetails = ref<any>(null)
+const visibleDrawer = ref<boolean>(false)
 
 const { pressed } = useMousePressed()
 const { x: xMonthListRef } = useScroll(monthListRef)
@@ -315,7 +317,7 @@ onMounted(async () => {
                   class="min-h-90px border-r-1px border-zinc-3/30 bg-slate-2/30 text-center backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
                 >
                   <span
-                    class="top-8.5 mt--2.5 block bg-white p-1 text-2.6/3 dark:bg-dark"
+                    class="sticky top-8.5 mt--2.5 block bg-white p-1 text-2.6/3 dark:bg-dark"
                     :class="{ hidden: time === '00' }"
                   >
                     {{ time }} {{ +time < 12 ? 'AM' : 'PM' }} </span>
@@ -396,6 +398,7 @@ onMounted(async () => {
                       :date="item.data.date"
                       @mouse-down-handler-event-move="(e) => dragHandlerEventMoveRef = e.target"
                       @mouse-down-handler-event-resize="(e) => dragHandlerEventResizeRef = e.target"
+                      @view-more-handler="(event) => (selectedEventForDetails = event, visibleDrawer = true)"
                     >
                       <template #content>
                         <div class="h-full flex flex-col justify-between pb-1">
@@ -412,6 +415,18 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+  <a-drawer
+    placement="right" popup-container="#layoutMain" :footer="false"
+    class="!z-99 ![&_.arco-drawer]:w-[calc(100%-5rem)] ![&_.arco-drawer-header]:border-b-stone-2 !lg:[&_.arco-drawer]:w-65% !xl:[&_.arco-drawer]:w-45% !dark:[&_.arco-drawer-header]:border-b-stone-9"
+    :visible="visibleDrawer" unmount-on-close @ok="() => visibleDrawer = false" @cancel="() => visibleDrawer = false"
+  >
+    <template #title>
+      Event details
+    </template>
+    <div class="">
+      {{ selectedEventForDetails }}
+    </div>
+  </a-drawer>
 </template>
 
 <style lang="less">
@@ -423,7 +438,7 @@ onMounted(async () => {
     @apply absolute top-0 w-full h-full;
 
     .event {
-      @apply absolute group left-0 min-h-max w-full flex-1 text-white;
+      @apply absolute group left-0 min-h-8 w-full flex-1 text-white;
       &.in--move, &.in--resize {
         @apply opacity-75 origin-top-right scale-100 z-45;
         div > * {

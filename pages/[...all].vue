@@ -3,7 +3,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <main p="x4 y10" text="center teal-700 dark:gray-200">
+  <div p="x4 y10" class="h-[calc(100vh-2.55rem)] flex flex-col justify-center text-center">
     <div text-4xl>
       <div i-carbon-warning inline-block />
     </div>
@@ -13,5 +13,5 @@ const router = useRouter()
         Back
       </button>
     </div>
-  </main>
+  </div>
 </template>

@@ -6,7 +6,6 @@ const { loggedIn, user, session, clear } = useUserSession()
 const color = useColorMode()
 const route = useRoute()
 const router = useRouter()
-const { y: windowScrollY } = useWindowScroll()
 
 const currentRoutePath = ref([route.path])
 router.afterEach((value) => {
@@ -42,8 +41,7 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
 
 <template>
   <div
-    class="mx-auto flex items-center justify-between border-b border-zinc-3/30 px-2 dark:border-zinc-6/30 lg:px-5 dark:text-light !transition-all"
-    :class="[windowScrollY > 200 && 'container', windowScrollY > 200 ? 'xl:py-0' : 'xl:py-5']"
+    class="mx-auto flex items-center justify-between px-2 dark:border-zinc-6/30 lg:px-5 dark:text-light !transition-all"
   >
     <div class="w-0 flex grow-0 items-center transition-width duration-300 md:w-35 sm:w-35">
       <div class="ml--2 hidden h-full w-9 items-center justify-center md:w-12">

@@ -99,7 +99,7 @@ watchDebounced(
   <client-only>
     <!-- loading state via #fallback slot -->
     <div v-if="hotelDetails && modelValue" class="relative h-auto w-full flex flex-col pb-18 delay-200 md:pb-0" :class="[!modelValue ? '!hidden !invisible delay-200' : '!visible delay-200']">
-      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px bg-light-1/85 p-2 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:border-dark-9 dark:bg-dark-9/85">
+      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px border-gray-4/15 bg-light-1/85 p-2 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:bg-dark-9/85">
         <a-button
           shape="circle" size="small"
           class="m-0 inline-block flex-none !h-6 !w-6 !border-1px !border-blue"
@@ -111,7 +111,7 @@ watchDebounced(
             <span i-carbon-arrow-left class="" />
           </template>
         </a-button>
-        <h3 class="text-md my-1 flex-1 text-center font-semibold font-chillax md:text-2xl">
+        <h3 class="text-md my-1 flex-1 text-center font-semibold font-mono md:text-2xl">
           Choisissez votre chambre
         </h3>
       </div>
@@ -247,7 +247,7 @@ watchDebounced(
                       flex-0 h-full w-20 flex items-center justify-center rounded-r-2px
                       class="ml-2 bg-blue-9/20 px-2 -mr-[calc(1.25rem-1px)]"
                     >
-                      <span class="h-7 w-7 transition-all group-hover:translate-x-15%" i-carbon-arrow-right />
+                      <span class="h-7 w-7 transition-all group-hover:translate-x-0%" i-carbon-money />
                     </span>
                   </a-button>
                 </div>

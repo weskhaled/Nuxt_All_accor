@@ -9,6 +9,7 @@ import {
   transformerVariantGroup,
 } from 'unocss'
 import { presetScrollbar } from 'unocss-preset-scrollbar'
+import { presetExtra } from 'unocss-preset-extra'
 
 export default defineConfig({
   shortcuts: [
@@ -23,6 +24,7 @@ export default defineConfig({
       scale: 1.2,
     }),
     presetTypography(),
+    presetExtra(),
     presetWebFonts({
       // provider: 'google',
       fonts: {

@@ -8,5 +8,5 @@ export default defineNuxtRouteMiddleware(() => {
   const expiryDate = session.value.loggedInAt + expires_in * 1000
 
   if (expiryDate < Date.now())
-    return navigateTo('/api/auth/google')
+    navigateTo('/api/auth/google')
 })

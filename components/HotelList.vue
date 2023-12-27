@@ -187,4 +187,17 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
 </template>
 
 <style lang="less">
+.card {
+  animation: fadeIn linear;
+  animation-range: entry;
+  animation-timeline: view(y);
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 </style>

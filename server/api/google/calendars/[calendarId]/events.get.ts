@@ -1,5 +1,6 @@
 import { ofetch } from 'ofetch'
 import dayjs from 'dayjs'
+import { randomColor } from '~/common/utils'
 
 export default defineEventHandler(async (event) => {
   const calendarId = event?.context?.params?.calendarId
@@ -40,10 +41,18 @@ export default defineEventHandler(async (event) => {
   })
 
   return events.items?.map((event: any) => ({
-    ...event,
+    id: event.id,
+    status: event.status,
     title: event.summary,
+    description: event.description,
     start: dayjs(event.start.dateTime),
     end: dayjs(event.end.dateTime),
-    color: '#00aaff',
+    eventUrl: event.htmlLink,
+    attachments: event.attachments || [],
+    attendees: event.attendees || [],
+    creator: event.creator,
+    organizer: event.organizer,
+    hangoutLink: event.hangoutLink,
+    color: randomColor(),
   }))
 })

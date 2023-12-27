@@ -49,21 +49,6 @@ const handle = ref<HTMLElement | null>(null)
 
 <template>
   <a-layout class="relative h-[calc(100vh-2.25rem)] min-h-screen flex font-sans !flex-row">
-    <!-- <div class="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center overflow-hidden opacity-45">
-      <div class="min-w-60rem w-100% flex flex-none justify-end">
-        <picture class="">
-          <source
-            srcset="https://tailwindcss.com/_next/static/media/docs@30.8b9a76a2.avif" type="image/avif" class="" style="
-"
-          >
-          <img src="https://tailwindcss.com/_next/static/media/docs@tinypng.d9e4dcdc.png" alt="" class="max-w-none w-[71.75rem] flex-none dark:hidden" decoding="async">
-        </picture>
-        <picture>
-          <source srcset="https://tailwindcss.com/_next/static/media/docs-dark@30.1a9f8cbf.avif" type="image/avif">
-          <img src="https://tailwindcss.com/_next/static/media/docs-dark@tinypng.1bbe175e.png" alt="" class="hidden max-w-none w-[90rem] flex-none dark:block" decoding="async">
-        </picture>
-      </div>
-    </div> -->
     <a-layout-sider
       hide-trigger collapsible :collapsed-width="60" :theme="isDark ? 'dark' : 'light'" :collapsed="true"
       class="layout-sidebar"
