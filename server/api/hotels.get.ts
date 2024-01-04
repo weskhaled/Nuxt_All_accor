@@ -1,4 +1,4 @@
-import { getHotels } from '../services'
+import { getHotels } from '../helpers'
 
 export default defineEventHandler(async (event) => {
   const {

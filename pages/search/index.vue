@@ -12,7 +12,7 @@ definePageMeta({
 const { dayjs } = useDayjs()
 const mapRef = ref<HTMLElement | null>()
 const { googleMapsApi, gMapsInstance, googleMapsCoreApi, MarkerClusterer, mapTools } = useGoogleMaps(mapRef)
-// const { coords } = useGeolocation()
+const { coords } = useGeolocation()
 
 const nightsRouteQuery = useRouteQuery('nights')
 const searchHotelInput: any = useRouteQuery('searchHotelInput')

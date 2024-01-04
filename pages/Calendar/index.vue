@@ -1,31 +1,34 @@
 <script setup lang="ts">
 import { v4 as uuid } from 'uuid'
 
+// import { ofetch } from 'ofetch'
+
 definePageMeta({
   layout: 'main',
   middleware: ['auth'],
 })
+
 const { dayjs } = useDayjs()
 const events = ref<any>([
   {
     id: uuid(),
     title: 'loerem ipsum dolor sit amet, consectetur adipiscing elit',
-    start: '2023-01-02 02:00:00',
-    end: '2023-01-03 06:00:00',
+    start: '2024-01-02 02:00:00',
+    end: '2024-01-03 06:00:00',
     color: '#9d174d',
   },
   {
     id: uuid(),
     title: 'loerem ipsum dolor sit amet, consectetur adipiscing elit',
-    start: '2023-01-04 06:30:00',
-    end: '2023-01-04 08:00:00',
+    start: '2024-01-04 06:30:00',
+    end: '2024-01-04 08:00:00',
     color: '#00aaff',
   },
   {
     id: uuid(),
     title: 'loerem ipsum dolor sit amet, consectetur adipiscing elit',
-    start: '2023-06-04 14:30:00',
-    end: '2023-06-04 17:00:00',
+    start: '2024-06-04 14:30:00',
+    end: '2024-06-04 17:00:00',
     color: '#00fafa',
   },
   {
@@ -52,7 +55,7 @@ const events = ref<any>([
 ])
 
 const { data, error } = await useFetch('/api/google/calendars/primary/events')
-if (!error.value && data.value)
+if (!error.value && data?.value?.length)
   events.value = data.value
 
 function eventChanged(event: any) {

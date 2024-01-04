@@ -9,6 +9,7 @@ import { pwa } from './config/pwa'
 
 export default defineNuxtConfig({
   modules: [
+    '@nuxtjs/supabase',
     '@vueuse/nuxt',
     '@unocss/nuxt',
     '@pinia/nuxt',
@@ -19,6 +20,8 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
+    google_client_id: process.env.GOOGLE_CLIENT_ID,
+    google_client_secret: process.env.GOOGLE_CLIENT_SECRET,
     public: {
       BASE_URL: process.env.BASE_URL,
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY,
@@ -41,12 +44,17 @@ export default defineNuxtConfig({
       },
     },
   },
-
+  supabase: {
+    redirectOptions: {
+      login: '/auth',
+      callback: '/auth/confirm',
+      exclude: ['/auth/confirm', '/', '/search'],
+    },
+  },
   experimental: {
     // when using generate, payload js assets included in sw precache manifest
     // but missing on offline, disabling extraction it until fixed
     payloadExtraction: false,
-    inlineSSRStyles: false,
     renderJsonPayloads: true,
     typedPages: true,
   },

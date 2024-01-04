@@ -1,4 +1,4 @@
-import { getMediasHotel } from '../services'
+import { getMediasHotel } from '../helpers'
 
 export default defineEventHandler(async (event) => {
   const {

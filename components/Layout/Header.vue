@@ -1,39 +1,16 @@
 <script setup lang="ts">
 import { sideHidden } from '~/common/stores/index'
 
-const { loggedIn, user, session, clear } = useUserSession()
+const supabaseClient = useSupabaseClient()
+const user = useSupabaseUser()
 
-const color = useColorMode()
+const { isDark, toggleDark } = useDark()
 const route = useRoute()
 const router = useRouter()
 
 const currentRoutePath = ref([route.path])
 router.afterEach((value) => {
   currentRoutePath.value = [value.path]
-})
-useHead({
-  meta: [{
-    id: 'theme-color',
-    name: 'theme-color',
-    content: () => color.value === 'dark' ? '#222222' : '#ffffff',
-  }],
-})
-
-function toggleDark() {
-  color.preference = color.value === 'dark' ? 'light' : 'dark'
-
-  if (color.preference === 'light')
-    document?.body.removeAttribute('arco-theme')
-
-  else
-    document?.body.setAttribute('arco-theme', 'dark')
-}
-
-onMounted(() => {
-  if (color.preference === 'light')
-    document?.body.removeAttribute('arco-theme')
-  else
-    document?.body.setAttribute('arco-theme', 'dark')
 })
 
 const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
@@ -74,7 +51,7 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
             contentClass: 'header-menu-nav',
           }"
           class="max-w-4xl w-full ![&_.arco-menu-item:not(:hover)]:bg-transparent ![&>.arco-menu-inner]:pl-0 !dark:[&_.arco-menu-item]:text-light"
-          mode="horizontal" :theme="color.value === 'dark' ? 'dark' : 'light'" :default-selected-keys="currentRoutePath"
+          mode="horizontal" :theme="isDark ? 'dark' : 'light'" :default-selected-keys="currentRoutePath"
         >
           <a-menu-item key="/" @click="async () => await $router.push('/')">
             Séjours
@@ -172,16 +149,16 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
           <a-dropdown trigger="hover">
             <a-button class="!px-1.5" shape="round" status="success">
               <span class="flex items-center">
-                <span v-if="!loggedIn" class="i-carbon-user-avatar-filled mr-1 inline-block h-5 w-5 text-sm" />
+                <span v-if="!user" class="i-carbon-user-avatar-filled mr-1 inline-block h-5 w-5 text-sm" />
                 <template v-else>
                   <img
-                    :src="user.google.picture"
-                    :alt="user.google.name"
+                    :src="user.user_metadata?.avatar_url"
+                    :alt="user.user_metadata?.full_name"
                     class="mr-1 inline-block h-5 w-5 rounded-full text-sm"
                   >
                 </template>
                 <span class="hidden capitalize sm:inline-block">
-                  {{ loggedIn ? user.google.name : 'Se connecter' }}
+                  {{ user ? user.user_metadata?.name : 'Se connecter' }}
                 </span>
                 <span class="i-carbon-chevron-down ml-0.75 inline-block h-3 w-3 text-sm leading-30px" />
               </span>
@@ -211,7 +188,7 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
                   Mes favoris
                 </template>
               </a-doption>
-              <a-doption v-if="!loggedIn" @click="async () => await router.push('/auth')">
+              <a-doption v-if="!user" @click="async () => await router.push('/auth')">
                 <template #icon>
                   <span class="text-md i-carbon-login inline-block h-5 w-5 leading-30px" />
                 </template>
@@ -219,7 +196,7 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
                   Se connecter
                 </template>
               </a-doption>
-              <a-doption v-else @click="clear()">
+              <a-doption v-else @click="async() => await supabaseClient.auth.signOut()">
                 <template #icon>
                   <span class="text-md i-carbon-logout inline-block h-5 w-5 leading-30px" />
                 </template>

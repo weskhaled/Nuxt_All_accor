@@ -1,4 +1,4 @@
-import { autocomplete } from '../services'
+import { autocomplete } from '../helpers'
 
 export default defineEventHandler(async (event) => {
   const { q } = getQuery(event)

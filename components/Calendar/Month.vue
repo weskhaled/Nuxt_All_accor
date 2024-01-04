@@ -6,7 +6,7 @@ const props = defineProps({
   events: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['update:modelValue', 'eventClicked'])
-// const breakpoints = useBreakpoints(breakpointsTailwind)
+const breakpoints = useBreakpoints(breakpointsTailwind)
 const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 const { dayjs } = useDayjs()
 
@@ -37,7 +37,7 @@ const daysInYear = computed(() => {
           inSameMonth,
           isToday,
           isSelected,
-          events: props.events.filter(event => date.isBetween(dayjs(event.start), dayjs(event.end).subtract(1, 'minute'), 'date', '[]')),
+          events: props.events?.filter(event => date.isBetween(dayjs(event.start), dayjs(event.end).subtract(1, 'minute'), 'date', '[]')),
         }
       }),
     }

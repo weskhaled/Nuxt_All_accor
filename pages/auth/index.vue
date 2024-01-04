@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// const { loggedIn, user, session } = useUserSession()
+const supabaseClient = useSupabaseClient()
 
 definePageMeta({
   layout: 'auth',
@@ -17,6 +17,21 @@ const loginForm = reactive({
   password: 'Pa55w0rd',
   rememberMe: false,
 })
+
+async function loginWithGoogle() {
+  await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${location.origin}/auth/confirm`,
+      // redirectTo: `${location.origin}/api/auth/google/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+        scopes: 'profile, email, openid, https://www.googleapis.com/auth/calendar',
+      },
+    },
+  })
+}
 </script>
 
 <template>
@@ -26,7 +41,7 @@ const loginForm = reactive({
     <div class="w-full flex flex-row">
       <!-- Sidebar -->
       <div class="hidden flex-col justify-between bg-blue-7 text-white lg:max-w-sm xl:max-w-1/2 lg:flex lg:p-8 xl:p-12">
-        <a href="javascript:;" class="flex items-center justify-start space-x-3" @click.stop="async() => await router.push('/')">
+        <a href="javascript:;" class="flex items-center justify-start space-x-3" @click="async() => await router.push('/')">
           <span class="h-8 w-8 rounded-full bg-white" />
           <span class="text-3xl font-medium font-script">
             All.accor
@@ -117,7 +132,11 @@ const loginForm = reactive({
               <span class="px-4">Or</span>
               <span class="w-full border-1px border-gray-200/30" />
             </div>
-            <a-button shape="round" type="primary" html-type="submit" class="group overflow-hidden !h-12 !w-full !border-blue-9/50 !rounded-full !text-white" size="large" href="/api/auth/google" role="link">
+            <a-button
+              shape="round" type="primary"
+              class="group overflow-hidden !h-12 !w-full !border-blue-9/50 !rounded-full !text-white" size="large" role="link"
+              @click="loginWithGoogle()"
+            >
               <span class="flex-1 text-4.5 font-500 font-mono">
                 Sign in with Google
               </span>

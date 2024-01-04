@@ -7,7 +7,11 @@ import 'swiper/css'
 export interface Props {
   sliders?: any[]
   allowTouchMove?: boolean
-  options?: { modules?: any[]; autoplay: any; containerClass?: string[] }
+  options?: {
+    modules?: any[]
+    autoplay: any
+    containerClass?: string[]
+  }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -117,7 +121,7 @@ watch(allowTouchMove, (val) => {
     <SwiperSlide v-for="(slide, index) in sliders" :key="index" class="relative h-full flex">
       <header class="h-full w-full flex items-center justify-center text-black dark:text-light">
         <div
-          class="absolute right-0 top-0 z-9 h-full w-full bg-black bg-[length:2px_2px] opacity-10"
+          class="absolute right-0 top-0 z-9 h-full w-full bg-[length:2px_2px] bg-black opacity-10"
           style="background-image: repeating-linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), repeating-linear-gradient(45deg, black 25%, white 25%, white 75%, black 75%, black);background-position: 0 0, 1px 1px"
         />
         <div

@@ -3,44 +3,26 @@ import { UseDraggable as Draggable } from '@vueuse/components'
 import { mdAndSmaller } from '~/common/stores/index'
 
 // import { promiseTimeout } from '@vueuse/core'
-
-const { user, loggedIn, clear } = useUserSession()
-const color = useColorMode()
+const { isDark, toggleDark } = useDark()
 const route = useRoute()
 const router = useRouter()
+
+const supabaseClient = useSupabaseClient()
+const user = useSupabaseUser()
+
+watch(user, (value) => {
+  if (!value)
+    return router.push('/auth')
+})
+
 const currentRoutePath = ref([route.path])
 
 router.afterEach((to) => {
   currentRoutePath.value = [to.path]
 })
 
-useHead({
-  meta: [{
-    id: 'theme-color',
-    name: 'theme-color',
-    content: () => color.value === 'dark' ? '#222222' : '#ffffff',
-  }],
-})
-
-function toggleDark() {
-  color.preference = color.value === 'dark' ? 'light' : 'dark'
-
-  if (color.preference === 'light')
-    document?.body.removeAttribute('arco-theme')
-
-  else
-    document?.body.setAttribute('arco-theme', 'dark')
-}
-
-onMounted(() => {
-  if (color.preference === 'light')
-    document?.body.removeAttribute('arco-theme')
-  else
-    document?.body.setAttribute('arco-theme', 'dark')
-})
-
 const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
-const isDark = computed(() => useColorMode().value === 'dark')
+
 const { width: windowWidth, height: windowHeight } = useWindowSize()
 
 const popupVisible = ref(false)
@@ -83,7 +65,7 @@ const handle = ref<HTMLElement | null>(null)
             <span class="arco-icon i-carbon-calendar-heat-map mx-0 inline-block text-sm" />
             Activités
           </a-menu-item>
-          <a-menu-item key="4">
+          <a-menu-item key="/chat" @click="async() => await $router.push('/chat')">
             <span class="arco-icon i-carbon-chat mx-0 inline-block text-sm" />
             Réunions & Evenements
           </a-menu-item>
@@ -129,23 +111,36 @@ const handle = ref<HTMLElement | null>(null)
       <div
         class="flex-0 mb-12 flex flex-col items-center space-y-4 [&_.arco-btn>.arco-btn-icon>span]:text-dark dark:[&_.arco-btn>.arco-btn-icon>span]:text-light"
       >
-        <a-tooltip content="Mon compte et mes points" position="tr" mini>
-          <a-button shape="circle" class="h-full flex items-center justify-center" type="text" @click="async() => await $router.push('/auth')">
-            <span v-if="!loggedIn" class="i-carbon-user-avatar block h-6 w-6" />
-            <template v-else>
-              <img
-                :src="user.google.picture"
-                :alt="user.google.name"
-                class="block h-full w-full rounded-full"
-              >
-            </template>
+        <a-dropdown v-if="user">
+          <a-button shape="circle" class="h-full flex items-center justify-center" type="text">
+            <img
+              :src="user.user_metadata?.avatar_url"
+              :alt="user.user_metadata?.full_name"
+              class="block h-full w-full rounded-full"
+            >
           </a-button>
-        </a-tooltip>
-        <a-tooltip content="Setting" position="tr" mini>
-          <a-button shape="circle" class="" type="text">
-            <template #icon>
-              <span class="i-carbon-settings block h-5 w-5 text-sm" />
-            </template>
+          <template #content>
+            <a-doption @click="async() => await supabaseClient.auth.signOut()">
+              <template #icon>
+                <span class="i-iconoir-log-out" />
+              </template>
+              <template #default>
+                Logout
+              </template>
+            </a-doption>
+            <a-doption @click="async() => await router.push('/user/profile')">
+              <template #icon>
+                <span class="i-iconoir-user-square" />
+              </template>
+              <template #default>
+                Profile
+              </template>
+            </a-doption>
+          </template>
+        </a-dropdown>
+        <a-tooltip v-else content="Mon compte et mes points" position="tr" mini>
+          <a-button shape="circle" class="h-full flex items-center justify-center" type="text" @click="async() => await $router.push('/auth')">
+            <span class="i-carbon-user-avatar block h-6 w-6" />
           </a-button>
         </a-tooltip>
         <a-tooltip content="Notifications" position="tr" mini>
@@ -156,6 +151,13 @@ const handle = ref<HTMLElement | null>(null)
               </template>
             </a-button>
           </a-badge>
+        </a-tooltip>
+        <a-tooltip content="Setting" position="tr" mini>
+          <a-button shape="circle" class="" type="text">
+            <template #icon>
+              <span class="i-carbon-settings block h-5 w-5 text-sm" />
+            </template>
+          </a-button>
         </a-tooltip>
         <a-tooltip content="Toggle Dark mode" position="tr" mini>
           <a-button shape="circle" class="" type="text" @click="toggleDark()">
@@ -181,21 +183,19 @@ const handle = ref<HTMLElement | null>(null)
         </Suspense>
       </a-layout-content>
       <LayoutFooter class="flex-0" />
-      <div class="bottom-0 z-5 w-full px-0 md:hidden">
+      <div class="bottom-0 z-999 w-full px-0 md:hidden">
         <div
           class="relative z-15 mx-auto w-auto flex items-center border border-slate-2/55 rounded-0 bg-slate-1/85 py-1 text-slate-500 backdrop-blur backdrop-filter dark:border-slate-9/55 dark:bg-black/85 dark:text-slate-200"
         >
           <div class="flex flex-auto items-center justify-evenly">
             <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="FavoriteList">
-              <template #icon>
-                <span v-if="!loggedIn" i-carbon-user-avatar class="i-carbon-user-avatar block h-5 w-5 text-sm" />
-                <template v-else>
-                  <img
-                    :src="user.google.picture"
-                    :alt="user.google.name"
-                    class="mr-1 inline-block h-5 w-5 rounded-full text-sm"
-                  >
-                </template>
+              <span v-if="!user" class="i-carbon-user-avatar block h-6 w-6" />
+              <template v-else>
+                <img
+                  :src="user.user_metadata?.avatar_url"
+                  :alt="user.user_metadata?.full_name"
+                  class="block h-6 w-6 rounded-full"
+                >
               </template>
             </a-button>
             <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="Previous">

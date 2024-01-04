@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import type { Dayjs } from 'dayjs'
 
-const props = withDefaults(defineProps<Props>(), {
+export interface Props {
+  event?: any
+  selectedEvent?: any
+  date?: Dayjs | null
+  showDuration?: boolean
+  isDraggable?: boolean
+  resizeMode?: boolean
+}
+
+withDefaults(defineProps<Props>(), {
   event: () => ref({}),
   selectedEvent: () => ref({}),
   date: null,
@@ -13,24 +22,15 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits(['mouseDownHandlerEventMove', 'mouseDownHandlerEventResize', 'viewMoreHandler'])
 
 const { dayjs } = useDayjs()
-
-export interface Props {
-  event?: any
-  selectedEvent?: any
-  date?: Dayjs | null
-  showDuration?: boolean
-  isDraggable?: boolean
-  resizeMode?: boolean
-}
 </script>
 
 <template>
   <div draggable="false">
     <div class="h-full flex flex-col">
       <div v-if="dayjs(event.start).day() === date?.day()" class="h-full flex flex-col overflow-hidden">
-        <div class="event-header relative mb-0 flex justify-between overflow-hidden truncate border-b border-black/25 bg-black/30 pl-0.5 text-3.5/6">
+        <div class="event-header relative mb-0 flex justify-between overflow-hidden truncate border-b border-black/55 text-3.5/6 before:(absolute top-0 z--1 h-full w-full rounded-tr-2px bg-black/30 content-[''])">
           <slot name="title">
-            <h4 class="truncate font-semibold">
+            <h4 class="truncate pl-0.5 font-semibold">
               {{ event.title }}
             </h4>
           </slot>
@@ -44,7 +44,7 @@ export interface Props {
           <slot name="content" />
         </div>
         <div
-          v-if="props.isDraggable"
+          v-if="isDraggable"
           class="event-dragger hover:bg-slate-3-3 absolute left-0 top-0 h-7 w-[calc(100%-1.5rem)] flex cursor-grab items-center rounded-bl-2px bg-slate-8/5 transition-all delay-0s group-focus:cursor-grabbing active:bg-slate-8/30"
           @mousedown="(e) => $emit('mouseDownHandlerEventMove', e)"
         />
@@ -63,7 +63,7 @@ export interface Props {
       </span>
 
       <div
-        v-if="props.resizeMode"
+        v-if="resizeMode"
         class="absolute bottom-0 h-1 w-full flex cursor-s-resize items-center bg-slate-2/50 transition-all delay-0.3s active:bg-slate-3 hover:bg-slate-3"
         @mousedown="(e) => $emit('mouseDownHandlerEventResize', e)"
       >
