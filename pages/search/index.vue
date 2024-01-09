@@ -37,7 +37,7 @@ const keySort = ref([
 const optionsPlaces = ref([])
 const loadingPlaces = ref(false)
 const layoutView = ref('MAP')
-const viewInMap = ref(false)
+const viewInMap = ref(true)
 // const showHotelDetails = ref(false)
 const visibleDrawer = ref(false)
 const visibleImgViewer = ref(false)
@@ -379,13 +379,16 @@ onMounted(async () => {
   <div class="h-full flex flex-col overflow-hidden">
     <div class="max-h-full flex flex-1 flex-col-reverse md:flex-row dark:text-white">
       <div
-        class="relative z-5 h-full w-2/2 flex flex-1 overflow-hidden border-bluegray-2 rounded-t-md 2xl:w-4/7 md:w-4/5 xl:w-5/7 xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
+        class="relative z-5 h-full w-2/2 flex flex-1 border-bluegray-2 rounded-t-md transition-all 2xl:w-4/7 md:w-4/5 xl:w-5/7 !overflow-hidden xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
       >
         <!-- list hotels -->
         <div
           :class="[selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']"
           class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200"
         >
+          <div class="absolute right-1/2 top-1 z-5 translate-x-[50%] md:hidden">
+            <CommonUpDownCheck v-model="viewInMap" class="" />
+          </div>
           <!-- overlay -->
           <div
             v-if="isMounted && selectedHotelForDetails && showHotelRoomsRouteQuery"
@@ -501,14 +504,14 @@ onMounted(async () => {
                       {{ destinationRouteQuery }}
                     </span>
                   </h3>
-                  <div class="hidden items-center md:flex !2xl:w-122.5 !md:w-65">
+                  <div class="hidden items-center md:flex !md:w-65 !xl:w-122.5">
                     <a-input-search
                       v-model="filters.searchInput" allow-clear search-button class="w-full"
                       placeholder="Please enter something"
                     />
                   </div>
                 </div>
-                <div class="max-w-65 md:w-3/8">
+                <div class="max-w-45 min-w-45 md:w-3/8">
                   <div class="w-full w-full flex flex items-center">
                     <div class="w-full flex flex-1 items-center">
                       <a-select
@@ -532,7 +535,7 @@ onMounted(async () => {
             <!-- hotel list -->
             <Suspense>
               <!-- component with nested async dependencies -->
-              <div class="mb-10.25 flex flex-1 bg-light-2/95 p-5px md:mb-0 dark:bg-dark-9/95">
+              <div class="flex flex-1 bg-light-2/95 p-5px md:mb-0 dark:bg-dark-9/95">
                 <div class="relative w-full flex flex-1 flex-col">
                   <div v-if="isMounted && !loadingGetHotels && !errorGetHotels" v-bind="wrapperProps" class="h-full p-0">
                     <div class="list flex flex-col space-y-5px">
@@ -584,8 +587,8 @@ onMounted(async () => {
       </div>
       <!-- google maps -->
       <div
-        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex p-0 transition-all md:h-full md:p-0"
-        :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-70px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-full' : 'lt-md:h-40%') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
+        class="right-0 top-0 z-2 z-4 mt--0 h-1/2 flex flex-none p-0 transition-all md:h-full md:p-00"
+        :class="[layoutView !== 'MAP' ? 'w-2/2' : 'w-2/2 md:w-1/5 xl:w-2/7 2xl:w-3/7 z-3', viewInMap && (layoutView === 'MAP' ? 'lt-md:pb-0px' : 'lt-md:pr-50px'), layoutView === 'MAP' ? (viewInMap ? 'lt-md:h-[calc(100%-15rem)]' : 'lt-md:h-15') : 'lt-md:h-full', selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-0 !md:w-55']"
       >
         <div
           id="maps" ref="mapRef"

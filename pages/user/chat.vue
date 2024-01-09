@@ -8,7 +8,7 @@ definePageMeta({
 <template>
   <div class="h-full flex">
     <div class="h-full w-full flex border-white/25 rounded-2px bg-white/50 dark:border-black/35 dark:bg-black/50">
-      <aside class="shadow-elevation-3 w-50 flex flex-col overflow-hidden overflow-y-auto border-r border-white/25 bg-white/60 shadow-sm lg:w-80 dark:border-black/35 dark:bg-black/60">
+      <aside class="w-50 flex flex-col overflow-hidden overflow-y-auto border-r border-white/25 bg-white/60 shadow-sm shadow-elevation-3 lg:w-80 dark:border-black/35 dark:bg-black/60">
         <div>
           <div class="sticky top-0 z-3 mb-2 h-16.25 flex flex-none items-center justify-between border-b border-white/25 bg-white/55 p-2 backdrop-blur dark:border-black/25 dark:bg-dark-9/55">
             <div class="flex items-center">
@@ -19,7 +19,7 @@ definePageMeta({
             </div>
             <span>
               <a-button size="large" type="text" shape="circle">
-                <span class="i-iconoir-chat-plus-in size-5 text-black dark:text-white" />
+                <span class="i-iconoir-chat-plus-in text-black size-5 dark:text-white" />
               </a-button>
             </span>
           </div>
@@ -33,9 +33,9 @@ definePageMeta({
                   <template v-if="i === 2">
                     <div>
                       <div class="flex items-center -space-x-5 rtl:space-x-reverse">
-                        <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="">
-                        <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="">
-                        <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-3.jpg" alt="">
+                        <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="">
+                        <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="">
+                        <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-3.jpg" alt="">
                       </div>
                     </div>
                   </template>
@@ -45,7 +45,7 @@ definePageMeta({
                         WK
                       </span>
                     </a-avatar>
-                    <span class="size-2 absolute left--0 top--1 border-1 border-white rounded-full bg-green-400 dark:border-gray-800" />
+                    <span class="absolute left--0 top--1 border-1 border-white rounded-full bg-green-400 size-2 dark:border-gray-800" />
                   </span>
                 </div>
                 <div class="flex-1 overflow-hidden">
@@ -59,18 +59,18 @@ definePageMeta({
                 <div class="flex flex-none flex-col text-xs space-y-1">
                   <div class="flex">
                     <div class="flex items-center justify-center">
-                      <span class="i-iconoir-double-check size-4 block text-green-3" />
+                      <span class="i-iconoir-double-check block text-green-3 size-4" />
                     </div>
                     <span class="text-3">
                       4 m
                     </span>
                   </div>
                   <div class="flex">
-                    <span class="size-4.5 flex items-center justify-center rounded-full bg-red-6 text-3 text-white">
+                    <span class="flex items-center justify-center rounded-full bg-red-6 text-3 text-white size-4.5">
                       5
                     </span>
                     <div class="flex flex-1 items-center justify-center">
-                      <span class="i-carbon-attachment size-3.5 block" />
+                      <span class="i-carbon-attachment block size-3.5" />
                     </div>
                   </div>
                 </div>
@@ -93,10 +93,10 @@ definePageMeta({
             <div class="flex-0 flex space-x-2">
               <div>
                 <div class="flex items-center -space-x-4 rtl:space-x-reverse">
-                  <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="">
-                  <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="">
-                  <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-3.jpg" alt="">
-                  <img class="size-8 border border-light-5 rounded-full border-solid dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-4.jpg" alt="">
+                  <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" alt="">
+                  <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" alt="">
+                  <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-3.jpg" alt="">
+                  <img class="border border-light-5 rounded-full border-solid size-8 dark:border-dark-5" src="https://flowbite.com/docs/images/people/profile-picture-4.jpg" alt="">
                 </div>
               </div>
               <a-button type="text" shape="circle">
@@ -120,10 +120,47 @@ definePageMeta({
               <picture><source srcset="https://tailwindcss.com/_next/static/media/docs@30.8b9a76a2.avif" type="image/avif"><img src="https://tailwindcss.com/_next/static/media/docs@tinypng.d9e4dcdc.png" alt="" class="max-w-none w-[71.75rem] flex-none dark:hidden" decoding="async"></picture><picture><source srcset="https://tailwindcss.com/_next/static/media/docs-dark@30.1a9f8cbf.avif" type="image/avif"><img src="https://tailwindcss.com/_next/static/media/docs-dark@tinypng.1bbe175e.png" alt="" class="hidden max-w-none w-[90rem] flex-none dark:block" decoding="async"></picture>
             </div>
           </div>
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center overflow-hidden opacity-45"
+          >
+            <div class="min-w-60rem w-100% flex flex-none justify-end">
+              <picture class="">
+                <source
+                  srcset="
+          https://tailwindcss.com/_next/static/media/docs@30.8b9a76a2.avif
+        "
+                  type="image/avif"
+                  class=""
+                  style="
+"
+                >
+                <img
+                  src="https://tailwindcss.com/_next/static/media/docs@tinypng.d9e4dcdc.png"
+                  alt=""
+                  class="max-w-none w-[71.75rem] flex-none dark:hidden"
+                  decoding="async"
+                >
+              </picture>
+              <picture>
+                <source
+                  srcset="
+          https://tailwindcss.com/_next/static/media/docs-dark@30.1a9f8cbf.avif
+        "
+                  type="image/avif"
+                >
+                <img
+                  src="https://tailwindcss.com/_next/static/media/docs-dark@tinypng.1bbe175e.png"
+                  alt=""
+                  class="hidden max-w-none w-[90rem] flex-none dark:block"
+                  decoding="async"
+                >
+              </picture>
+            </div>
+          </div>
           <div class="chat-content">
             <div class="flex flex-col">
               <div class="flex gap-3 px-3 py-5">
-                <div class="size-45px shrink-0 rounded-full">
+                <div class="shrink-0 rounded-full size-45px">
                   <img src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" class="h-full w-full rounded-full object-cover" alt="">
                 </div>
                 <div class="overflow-hidden text-left">
@@ -141,7 +178,7 @@ definePageMeta({
               </div>
               <!-- next chat -->
               <div class="flex gap-3 px-3 py-5">
-                <div class="size-45px shrink-0 rounded-full">
+                <div class="shrink-0 rounded-full size-45px">
                   <img src="https://flowbite.com/docs/images/people/profile-picture-5.jpg" class="h-full w-full rounded-full object-cover" alt="">
                 </div>
                 <div class="overflow-hidden text-left">

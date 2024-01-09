@@ -7,7 +7,7 @@ export interface Props {
   date?: Dayjs | null
   showDuration?: boolean
   isDraggable?: boolean
-  resizeMode?: boolean
+  isResizable?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
@@ -16,7 +16,7 @@ withDefaults(defineProps<Props>(), {
   date: null,
   showDuration: false,
   isDraggable: false,
-  resizeMode: false,
+  isResizable: false,
 })
 
 defineEmits(['mouseDownHandlerEventMove', 'mouseDownHandlerEventResize', 'viewMoreHandler'])
@@ -28,7 +28,7 @@ const { dayjs } = useDayjs()
   <div draggable="false">
     <div class="h-full flex flex-col">
       <div v-if="dayjs(event.start).day() === date?.day()" class="h-full flex flex-col overflow-hidden">
-        <div class="event-header relative mb-0 flex justify-between overflow-hidden truncate border-b border-black/55 text-3.5/6 before:(absolute top-0 z--1 h-full w-full rounded-tr-2px bg-black/30 content-[''])">
+        <div class="event-header relative mb-0 flex justify-between overflow-hidden truncate border-b border-dark/45 text-3.5/6 before:(absolute top-0 z--1 h-full w-full rounded-tr-2px bg-black/30 content-['']) dark:border-dark-6/60">
           <slot name="title">
             <h4 class="truncate pl-0.5 font-semibold">
               {{ event.title }}
@@ -39,15 +39,15 @@ const { dayjs } = useDayjs()
           >
             <button class="i-carbon-overflow-menu-horizontal h-full w-full" @mousedown="$emit('viewMoreHandler', event)" />
           </span>
+          <div
+            v-if="isDraggable"
+            class="event-dragger absolute left-0 top-0 h-full w-[calc(100%-1.5rem)] flex cursor-grab items-center rounded-bl-2px bg-slate-8/5 transition-all delay-0s group-focus:cursor-grabbing active:bg-slate-6/10 hover:bg-slate-6/10"
+            @mousedown="(e) => $emit('mouseDownHandlerEventMove', e)"
+          />
         </div>
         <div class="event-content flex-1 overflow-auto p-x-0.5 pb-2px text-3.8/5 dark:bg-dark-7/75">
           <slot name="content" />
         </div>
-        <div
-          v-if="isDraggable"
-          class="event-dragger hover:bg-slate-3-3 absolute left-0 top-0 h-7 w-[calc(100%-1.5rem)] flex cursor-grab items-center rounded-bl-2px bg-slate-8/5 transition-all delay-0s group-focus:cursor-grabbing active:bg-slate-8/30"
-          @mousedown="(e) => $emit('mouseDownHandlerEventMove', e)"
-        />
       </div>
 
       <span
@@ -63,7 +63,7 @@ const { dayjs } = useDayjs()
       </span>
 
       <div
-        v-if="resizeMode"
+        v-if="isResizable"
         class="absolute bottom-0 h-1 w-full flex cursor-s-resize items-center bg-slate-2/50 transition-all delay-0.3s active:bg-slate-3 hover:bg-slate-3"
         @mousedown="(e) => $emit('mouseDownHandlerEventResize', e)"
       >

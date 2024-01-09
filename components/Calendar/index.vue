@@ -1,17 +1,16 @@
 <script setup lang="ts">
+import type { Dayjs } from 'dayjs'
 import { breakpointsTailwind, useVirtualList } from '@vueuse/core'
 import { useRouteHash } from '@vueuse/router'
 import Event from './Event.vue'
 
-interface Props {
-  events?: Array<any>
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  events: () => [],
+const emit = defineEmits(['addNewEvent', 'eventChanged'])
+const events = defineModel('events', {
+  type: Array<any>,
+  default: () => [],
 })
+const modelValue = defineModel<object | null>({ required: false })
 
-defineEmits(['eventChanged'])
 const routeHash = useRouteHash()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const { y: yMouse } = useMouse({ type: 'client' })
@@ -23,8 +22,6 @@ const monthListRef = ref<HTMLElement | null>()
 const dragHandlerEventMoveRef = ref<EventTarget | null>()
 const selectedEvent = ref<any>(null)
 const timeIndicatorTop = ref<number>(0)
-const selectedEventForDetails = ref<any>(null)
-const visibleDrawer = ref<boolean>(false)
 
 const { pressed } = useMousePressed()
 const { x: xMonthListRef } = useScroll(monthListRef)
@@ -42,7 +39,7 @@ const allItems = computed(() => {
     const date = dayjs(dayjs(`${dayjs(selectedDate.value).year()}-01-01`).dayOfYear(index + 1))
 
     return {
-      events: props.events
+      events: events.value
         .filter(ev => date.isBetween(dayjs(ev.start), dayjs(ev.end).subtract(1, 'minute'), 'date', '[]'))
         .map(ev => ({
           ...ev,
@@ -81,13 +78,13 @@ const eventDragOrResize = computed(() => {
 
 const selectedEventByRef = computed({
   get() {
-    return selectedEventRef.value ? props.events.find(event => `${event.id}` === `${selectedEventRef.value?.dataset.event_id}`) : null
+    return selectedEventRef.value ? events.value.find(event => `${event.id}` === `${selectedEventRef.value?.dataset.event_id}`) : null
   },
   set(newValue) {
     if (!newValue)
       return
 
-    const fundedEvent = props.events.find(event => event.id === newValue.id)
+    const fundedEvent = events.value.find(event => event.id === newValue.id)
 
     if (fundedEvent) {
       fundedEvent.end = newValue?.end
@@ -113,7 +110,7 @@ watch([selectedEventRef, pressed, yMouse], async ([selectedEventRefValue, presse
     else if (eventDragOrResize.value === 'DRAG') {
       containerProps.ref?.value?.classList?.add('event--move')
       selectedEventByRef.value.inMove = true
-      const { date, col_time } = element.value?.dataset
+      const { date, col_time } = element.value?.dataset || {}
       if (!date || !col_time)
         return
 
@@ -206,12 +203,30 @@ watchThrottled(
 
 function scrollToEvent(day: number, month: number, year = dayjs(selectedDate.value).year()) {
   selectedDate.value = dayjs().set('year', year).set('date', day).set('month', month).format('YYYY-MM-DD')
-  if (props.events.some(ev => dayjs(new Date(dayjs(selectedDate.value).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')))
-    yContainerRef.value = +(dayjs(props.events.find(ev => dayjs(new Date(dayjs(selectedDate.value).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')).start).hour() * 90)
+  if (events.value.some(ev => dayjs(new Date(dayjs(selectedDate.value).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')))
+    yContainerRef.value = +(dayjs(events.value.find(ev => dayjs(new Date(dayjs(selectedDate.value).year(), month, day)).isBetween(dayjs(ev.start), dayjs(ev.end), 'date', '[]')).start).hour() * 90)
 }
-
+function addNewEvent(date: Dayjs) {
+  const newEvent = {
+    id: `newEvent-${Math.random().toString(36).substring(2, 9)}`,
+    title: 'New event',
+    description: '',
+    location: '',
+    organizer: {
+      email: '',
+    },
+    start: date.format('YYYY-MM-DD HH:mm:ss'),
+    end: date.add(30, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
+    color: '#ee3333',
+    isDraggable: true,
+    isResizable: true,
+  }
+  emit('addNewEvent', newEvent)
+}
 onMounted(async () => {
   updateTimeIndicator()
+  await nextTick()
+  yContainerRef.value = +(dayjs().hour() * 90)
   await nextTick()
   scrollTo(dayjs(selectedDate.value).dayOfYear() - 1)
 })
@@ -220,7 +235,7 @@ onMounted(async () => {
 <template>
   <div class="relative z-2 h-screen flex flex-1 flex-col snap-y snap-mandatory overflow-x-hidden">
     <!-- grid months -->
-    <div id="grid-months" class="relative h-[calc(100%-4rem)] flex flex flex-none flex-col snap-start overflow-hidden bg-white/87 backdrop-blur dark:bg-black/87">
+    <div v-if="false" id="grid-months" class="relative h-[calc(100%-4rem)] flex flex flex-none flex-col snap-start overflow-hidden bg-white/87 backdrop-blur dark:bg-black/87">
       <div class="h-full overflow-hidden border-b-1px border-gray-4/15">
         <CalendarMonth v-model="selectedDate" :events="events" @event-clicked="(eventData) => (scrollToEvent(dayjs(eventData.start).date(), dayjs(eventData.start).month()), routeHash = '#grid-events')" />
       </div>
@@ -306,15 +321,15 @@ onMounted(async () => {
             v-bind="wrapperProps" id="days-per-year"
             class="relative min-h-0 min-w-0 before-z-4 !h-auto"
           >
-            <!-- sticky left indicator -->
+            <!-- sticky left time indicator -->
             <div class="sticky left-0 z-99 h-full flex-none select-none">
               <div class="time-fixed-side relative left-0 z-10 mt-8 min-w-45px w-45px flex flex-col text-3">
                 <span
-                  class="absolute left-0 top--8 z-9 h-8.25 w-11.25 border-b-1px border-r-1px border-zinc-2/30 bg-slate-2/30 backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
+                  class="absolute left-0 top--8 z-9 h-8.25 w-11.25 border-b-1px border-r-1px border-zinc-2/30 bg-slate-2/30 backdrop-blur-sm dark:border-zinc-6/30 dark:bg-slate-8/30"
                 />
                 <div
                   v-for="time in Array.from({ length: 24 }, (_, i) => `${i < 10 ? '0' : ''}${i}`)" :key="time"
-                  class="min-h-90px border-r-1px border-zinc-3/30 bg-slate-2/30 text-center backdrop-blur dark:border-zinc-6/30 dark:bg-slate-8/30"
+                  class="min-h-90px border-r-1px border-zinc-3/30 bg-slate-2/30 text-center backdrop-blur-sm dark:border-zinc-6/30 dark:bg-slate-8/30"
                 >
                   <span
                     class="sticky top-8.5 mt--2.5 block bg-white p-1 text-2.6/3 dark:bg-dark"
@@ -353,7 +368,7 @@ onMounted(async () => {
                   </div>
                 </div>
                 <div class="relative mx-1 overflow-hidden">
-                  <div class="relative mx-auto w-full bg-blue-5/2 px-1 text-center">
+                  <div class="relative mx-auto w-full bg-blue-5/2 px-0 text-center">
                     <div
                       v-for="time in Array.from({ length: 24 }, (_, i) => i)" :key="time"
                       class="relative h-90px flex flex-col p-0"
@@ -363,19 +378,23 @@ onMounted(async () => {
                         :data-col_time="item.data.date.set('hour', time).set('minute', 0).set('second', 0).format('HH:mm:ss')"
                         class="h-1/2 border-b-1px border-blue-6/20 border-dashed"
                       >
-                        <span />
+                        <span role="button" class="group button-add h-full w-full flex cursor-pointer items-center justify-center" @click="addNewEvent(item.data.date.set('hour', time).set('minute', 0).set('second', 0))">
+                          <span class="i-carbon-add-large opacity-0 transition-all group-hover:opacity-100" />
+                        </span>
                       </div>
                       <div
                         :data-date="item.data.date.format('YYYY-MM-DD')"
                         :data-col_time="item.data.date.set('hour', time).set('minute', 30).set('second', 0).format('HH:mm:ss')"
                         class="h-1/2 border-b-1px border-blue-6/40" :class="{ '!border-b-0': time === 23 }"
                       >
-                        <span />
+                        <span role="button" class="button-add group h-full w-full flex cursor-pointer items-center justify-center" @click="addNewEvent(item.data.date.set('hour', time).set('minute', 30).set('second', 0))">
+                          <span class="i-carbon-add-large opacity-0 transition-all group-hover:opacity-100" />
+                        </span>
                       </div>
                     </div>
                   </div>
                   <!-- events -->
-                  <div class="events-card">
+                  <div class="events-card contents">
                     <Event
                       v-for="(event, index) in item.data.events"
                       :key="event.id"
@@ -395,10 +414,12 @@ onMounted(async () => {
                       class="event"
                       :event="event"
                       show-duration
+                      :is-draggable="event.isDraggable"
+                      :is-resizable="event.isResizable"
                       :date="item.data.date"
                       @mouse-down-handler-event-move="(e) => dragHandlerEventMoveRef = e.target"
                       @mouse-down-handler-event-resize="(e) => dragHandlerEventResizeRef = e.target"
-                      @view-more-handler="(event) => (selectedEventForDetails = event, visibleDrawer = true)"
+                      @view-more-handler="(event) => modelValue = event"
                     >
                       <template #content>
                         <div class="h-full flex flex-col justify-between pb-1">
@@ -415,18 +436,6 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-  <a-drawer
-    placement="right" popup-container="#layoutMain" :footer="false"
-    class="!z-99 ![&_.arco-drawer]:w-[calc(100%-5rem)] ![&_.arco-drawer-header]:border-b-stone-2 !lg:[&_.arco-drawer]:w-65% !xl:[&_.arco-drawer]:w-45% !dark:[&_.arco-drawer-header]:border-b-stone-9"
-    :visible="visibleDrawer" unmount-on-close @ok="() => visibleDrawer = false" @cancel="() => visibleDrawer = false"
-  >
-    <template #title>
-      Event details
-    </template>
-    <div class="">
-      {{ selectedEventForDetails }}
-    </div>
-  </a-drawer>
 </template>
 
 <style lang="less">
@@ -452,6 +461,10 @@ onMounted(async () => {
 
   &.event--move {
     @apply cursor-grabbing;
+
+    .button-add {
+      @apply !pointer-events-none;
+    }
 
     .event {
       @apply !pointer-events-none cursor-grabbing transition-all-0;

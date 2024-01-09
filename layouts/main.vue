@@ -2,7 +2,6 @@
 import { UseDraggable as Draggable } from '@vueuse/components'
 import { mdAndSmaller } from '~/common/stores/index'
 
-// import { promiseTimeout } from '@vueuse/core'
 const { isDark, toggleDark } = useDark()
 const route = useRoute()
 const router = useRouter()
@@ -61,15 +60,15 @@ const handle = ref<HTMLElement | null>(null)
             <span class="arco-icon i-carbon-search mx-0 inline-block text-sm" />
             Recherche
           </a-menu-item>
-          <a-menu-item key="/calendar" @click="async() => await $router.push('/calendar')">
+          <a-menu-item key="/user/calendar" @click="async() => await $router.push('/user/calendar')">
             <span class="arco-icon i-carbon-calendar-heat-map mx-0 inline-block text-sm" />
             Activités
           </a-menu-item>
-          <a-menu-item key="/chat" @click="async() => await $router.push('/chat')">
+          <a-menu-item key="/user/chat" @click="async() => await $router.push('/user/chat')">
             <span class="arco-icon i-carbon-chat mx-0 inline-block text-sm" />
             Réunions & Evenements
           </a-menu-item>
-          <a-menu-item key="5">
+          <a-menu-item key="/gallery" @click="$router.push('/gallery')">
             <span class="arco-icon i-carbon-plane-private mx-0 inline-block text-sm" />
             Professionnels
           </a-menu-item>
@@ -120,20 +119,20 @@ const handle = ref<HTMLElement | null>(null)
             >
           </a-button>
           <template #content>
-            <a-doption @click="async() => await supabaseClient.auth.signOut()">
-              <template #icon>
-                <span class="i-iconoir-log-out" />
-              </template>
-              <template #default>
-                Logout
-              </template>
-            </a-doption>
             <a-doption @click="async() => await router.push('/user/profile')">
               <template #icon>
                 <span class="i-iconoir-user-square" />
               </template>
               <template #default>
                 Profile
+              </template>
+            </a-doption>
+            <a-doption @click="async() => await supabaseClient.auth.signOut()">
+              <template #icon>
+                <span class="i-iconoir-log-out" />
+              </template>
+              <template #default>
+                Logout
               </template>
             </a-doption>
           </template>
@@ -188,7 +187,12 @@ const handle = ref<HTMLElement | null>(null)
           class="relative z-15 mx-auto w-auto flex items-center border border-slate-2/55 rounded-0 bg-slate-1/85 py-1 text-slate-500 backdrop-blur backdrop-filter dark:border-slate-9/55 dark:bg-black/85 dark:text-slate-200"
         >
           <div class="flex flex-auto items-center justify-evenly">
-            <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="FavoriteList">
+            <a-button
+              shape="circle"
+              class="block !h-9 !w-9"
+              type="text"
+              @click="async() => user ? await router.push('/user/profile') : await router.push('/auth')"
+            >
               <span v-if="!user" class="i-carbon-user-avatar block h-6 w-6" />
               <template v-else>
                 <img
@@ -198,7 +202,7 @@ const handle = ref<HTMLElement | null>(null)
                 >
               </template>
             </a-button>
-            <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="Previous">
+            <a-button shape="circle" class="block !h-9 !w-9" type="text" aria-label="Previous" @click="async() => router.back()">
               <template #icon>
                 <span i-carbon-undo class="" />
               </template>

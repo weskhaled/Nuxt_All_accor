@@ -16,7 +16,6 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     '@vite-pwa/nuxt',
     '@nuxt/devtools',
-    'nuxt-auth-utils',
   ],
 
   runtimeConfig: {
@@ -30,20 +29,13 @@ export default defineNuxtConfig({
       API_ACCOR_API_KEY: process.env.API_ACCOR_API_KEY,
       DATABASE_URL: process.env.DATABASE_URL,
     },
-    oauth: {
-      google: {
-        clientId: process.env.NUXT_OAUTH_GOOGLE_CLIENT_ID,
-        clientSecret: process.env.NUXT_OAUTH_GOOGLE_CLIENT_SECRET,
-        scope: ['profile', 'email', 'https://www.googleapis.com/auth/calendar', 'openid'],
-        responseType: 'token',
-        redirectUrl: '/api/auth/google',
-      },
-      session: {
-        name: 'nuxt-session',
-        password: process.env.NUXT_SESSION_PASSWORD,
-      },
-    },
   },
+
+  vue: {
+    defineModel: true,
+    propsDestructure: true,
+  },
+
   supabase: {
     redirectOptions: {
       login: '/auth',

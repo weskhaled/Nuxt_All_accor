@@ -164,7 +164,7 @@ const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
               </span>
             </a-button>
             <template #content>
-              <a-doption @click="$router.push('/calendar')">
+              <a-doption @click="$router.push('/user/calendar')">
                 <template #icon>
                   <span class="text-md i-carbon-calculation inline-block h-5 w-5 leading-30px" />
                 </template>
