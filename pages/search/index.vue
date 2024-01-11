@@ -381,14 +381,14 @@ onMounted(async () => {
       <div
         class="relative z-5 h-full w-2/2 flex flex-1 border-bluegray-2 rounded-t-md transition-all 2xl:w-4/7 md:w-4/5 xl:w-5/7 !overflow-hidden xl:border-r-1px dark:border-bluegray-9 md:rounded-0"
       >
+        <div class="absolute right-1/2 top-1 z-5 translate-x-[50%] md:hidden">
+          <CommonUpDownCheck v-model="viewInMap" class="" />
+        </div>
         <!-- list hotels -->
         <div
           :class="[selectedHotelForDetails && showHotelRoomsRouteQuery && 'delay-200 -translate-x-[calc(100%-50px)] shadow-md b-r-1px dark:border-bluegray-9 border-bluegray-2']"
           class="relative z-3 h-full w-full flex overflow-hidden transition-transform-200"
         >
-          <div class="absolute right-1/2 top-1 z-5 translate-x-[50%] md:hidden">
-            <CommonUpDownCheck v-model="viewInMap" class="" />
-          </div>
           <!-- overlay -->
           <div
             v-if="isMounted && selectedHotelForDetails && showHotelRoomsRouteQuery"

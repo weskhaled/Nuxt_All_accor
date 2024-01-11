@@ -27,7 +27,4 @@ useHead({
 </template>
 
 <style scoped lang="less">
-html {
-  @apply bg-light text-dark dark:bg-dark-9 dark:text-light-50;
-}
 </style>

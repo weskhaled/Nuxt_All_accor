@@ -99,7 +99,7 @@ watchDebounced(
   <client-only>
     <!-- loading state via #fallback slot -->
     <div v-if="hotelDetails && modelValue" class="relative h-auto w-full flex flex-col pb-18 delay-200 md:pb-0" :class="[!modelValue ? '!hidden !invisible delay-200' : '!visible delay-200']">
-      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px border-gray-4/15 bg-light-1/85 p-2 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:bg-dark-9/85">
+      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px border-gray-4/15 bg-light-1/85 px-2 py-3 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:bg-dark-9/85">
         <a-button
           shape="circle" size="small"
           class="m-0 inline-block flex-none !h-6 !w-6 !border-1px !border-blue"
@@ -111,7 +111,7 @@ watchDebounced(
             <span i-carbon-arrow-left class="" />
           </template>
         </a-button>
-        <h3 class="text-md my-1 flex-1 text-center font-semibold font-mono md:text-2xl">
+        <h3 class="text-md my-0 ml--6 flex-1 text-center text-lg font-semibold font-mono">
           Choisissez votre chambre
         </h3>
       </div>
@@ -123,7 +123,7 @@ watchDebounced(
             </h1>
           </div>
           <!-- card hotel -->
-          <div class="[--animate-duration:0.5s] m-0 mb-2 w-full flex-none lg:sticky lg:top-17.25 lg:float-right lg:mb-0 lg:max-w-sm lg:w-xs xl:w-sm">
+          <div class="m-0 mb-2 w-full flex-none lg:sticky lg:top-17.25 lg:float-right lg:mb-0 lg:max-w-sm lg:w-xs xl:w-sm">
             <div class="w-full overflow-hidden border border-gray-200 rounded-sm bg-white/75 shadow-sm dark:border-gray-700 dark:bg-gray-8/75">
               <div class="relative">
                 <a-carousel
@@ -235,7 +235,7 @@ watchDebounced(
                       <span class="block text-zinc-5">(frais et taxes inclus)</span>
                     </span>
 
-                    <span class="text-lg text-gray-900 font-light lg:text-3xl dark:text-white" :class="[selectedTariffChanged && 'animate__animated animate__bounce']">
+                    <span class="text-lg text-gray-900 font-light animated-repeat-1 animated-duration-0.5s lg:text-3xl dark:text-white" :class="[selectedTariffChanged && 'animated animate-bounce-in-down']">
                       {{ (selectedRoomOffer?.offer?.pricing?.amount?.afterTax || 0).toLocaleString('fr-FR', { style: 'currency', currency: selectedRoomOffer?.offer?.pricing?.currency || 'EUR' }) }}
                     </span>
                   </div>
@@ -290,7 +290,7 @@ watchDebounced(
                       </div>
                     </div>
                   </div>
-                  <div class="[--animate-duration:0.3s] mt-2">
+                  <div class="mt-2">
                     <a-collapse :default-active-key="[`0_${room.code}`]" :bordered="false">
                       <a-collapse-item :key="`${index}_${room.code}`" class="![&_.arco-collapse-item-content]:px-2">
                         <template #header>
@@ -309,7 +309,7 @@ watchDebounced(
                         <div class="">
                           <a-radio-group v-model="selectedTariff" class="w-full flex flex-col space-y-2">
                             <template v-for="item in room.offers" :key="item.code">
-                              <a-radio class="w-full !mr-0 !pl-0" :value="`${room.code}_${item.code}`" :class="[selectedTariff === `${room.code}_${item.code}` && 'animate__animated animate__pulse']">
+                              <a-radio class="w-full animated-repeat-1 animated-duration-200ms !mr-0 !pl-0" :value="`${room.code}_${item.code}`" :class="[selectedTariff === `${room.code}_${item.code}` && 'animated animate-pulse']">
                                 <template #radio="{ checked }">
                                   <div
                                     class="custom-radio-card flex items-start"
