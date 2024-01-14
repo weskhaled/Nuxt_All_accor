@@ -1,17 +1,17 @@
 <script setup>
-import { breakpointsTailwind } from '@vueuse/core'
+// import { breakpointsTailwind } from '@vueuse/core'
 
 const props = defineProps({
   modelValue: { type: [String, Number, Date] },
   events: { type: Array, default: () => [] },
 })
 const emit = defineEmits(['update:modelValue', 'eventClicked'])
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const isLargeScreen = useMediaQuery('(min-width: 1024px)')
+// const breakpoints = useBreakpoints(breakpointsTailwind)
+// const isLargeScreen = useMediaQuery('(min-width: 1024px)')
 const { dayjs } = useDayjs()
 
 const { modelValue } = useVModels(props, emit)
-const [valueShowMonths, toggleShowMonths] = useToggle()
+// const [valueShowMonths, toggleShowMonths] = useToggle()
 const showSelectedMonth = ref(-1)
 const daysInWeek = computed(() =>
   Array.from({ length: 7 }, (_, i) => dayjs().isoWeekday(i)),

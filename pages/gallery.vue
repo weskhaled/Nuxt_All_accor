@@ -7,7 +7,7 @@ definePageMeta({
 
 const wrapperRef = ref<HTMLElement | null>(null)
 const contentRef = ref<HTMLElement | null>(null)
-const { x, y, isScrolling, arrivedState, directions } = useScroll(wrapperRef)
+const { isScrolling, directions } = useScroll(wrapperRef)
 
 const lastScrollDirection = ref<'up' | 'down'>('down')
 watch(isScrolling, (val) => {
@@ -38,15 +38,9 @@ function chunks<T>(arr: T[], size: number) {
 
 function onIntersectionObserver([{ isIntersecting, target }]: IntersectionObserverEntry[]) {
   // add class in-viewport if isIntersecting
-//   if (lastScrollDirection.value === 'down' && !isIntersecting)
   if (isScrolling.value)
     isIntersecting ? target.classList.add('in-viewport') : target.classList.remove('in-viewport')
-//   else
-//     target.classList.add('in-viewport')
 }
-watch(groupedItems, (val) => {
-  console.log(val)
-})
 </script>
 
 <template>

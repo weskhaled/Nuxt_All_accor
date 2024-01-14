@@ -6,7 +6,7 @@ const API_ACCOR_MAPS_URL = config.public.API_ACCOR_MAPS_URL
 const API_ACCOR_API_KEY = config.public.API_ACCOR_API_KEY
 
 let lastFilters: any = null
-let newSearchRequest = true
+// let newSearchRequest = true
 
 export async function autocomplete(q: string) {
   const { predictions } = await ofetch(`
@@ -28,10 +28,8 @@ export async function getHotels(filters?: any) {
   }
 
   if (lastFilters) {
-    if (lastFilters.destination !== filters.destination) {
+    if (lastFilters.destination !== filters.destination)
       lastFilters = filters
-      newSearchRequest = true
-    }
   }
 
   // const { results } = await ofetch(`https://api.accor.com/catalog/v1/hotels?q=${encodeURIComponent(JSON.stringify(filters))}`, {

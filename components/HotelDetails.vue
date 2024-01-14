@@ -46,7 +46,9 @@ useAsyncData(
         selectedTariff.value = `${rooms.value[0]?.code}_${rooms.value[0]?.offers[0]?.code}`
       }
 
-      else if (error.value) { errorGetRooms.value = error.value }
+      else if (error.value) {
+        errorGetRooms.value = error.value
+      }
 
       loadingGetRooms.value = false
     })
@@ -98,14 +100,16 @@ watchDebounced(
 <template>
   <client-only>
     <!-- loading state via #fallback slot -->
-    <div v-if="hotelDetails && modelValue" class="relative h-auto w-full flex flex-col pb-18 delay-200 md:pb-0" :class="[!modelValue ? '!hidden !invisible delay-200' : '!visible delay-200']">
-      <div class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px border-gray-4/15 bg-light-1/85 px-2 py-3 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:bg-dark-9/85">
+    <div
+      v-if="hotelDetails && modelValue" class="relative h-auto w-full flex flex-col pb-18 delay-200 md:pb-0"
+      :class="[!modelValue ? '!hidden !invisible delay-200' : '!visible delay-200']"
+    >
+      <div
+        class="header-hotel-details sticky top-0 z-11 w-full flex flex-none items-center justify-between border-b-1px border-gray-4/15 bg-light-1/85 px-2 py-3 shadow-bluegray/0 shadow-none backdrop-blur backdrop-filter dark:bg-dark-9/85"
+      >
         <a-button
-          shape="circle" size="small"
-          class="m-0 inline-block flex-none !h-6 !w-6 !border-1px !border-blue"
-          type="text"
-          aria-label="Previous"
-          @click="() => (modelValue = null, selectedHotelId = null)"
+          shape="circle" size="small" class="m-0 inline-block flex-none !h-6 !w-6 !border-1px !border-blue"
+          type="text" aria-label="Previous" @click="() => (modelValue = null, selectedHotelId = null)"
         >
           <template #icon>
             <span i-carbon-arrow-left class="" />
@@ -123,8 +127,12 @@ watchDebounced(
             </h1>
           </div>
           <!-- card hotel -->
-          <div class="m-0 mb-2 w-full flex-none lg:sticky lg:top-17.25 lg:float-right lg:mb-0 lg:max-w-sm lg:w-xs xl:w-sm">
-            <div class="w-full overflow-hidden border border-gray-200 rounded-sm bg-white/75 shadow-sm dark:border-gray-700 dark:bg-gray-8/75">
+          <div
+            class="m-0 mb-2 w-full flex-none lg:sticky lg:top-17.25 lg:float-right lg:mb-0 lg:max-w-sm lg:w-xs xl:w-sm"
+          >
+            <div
+              class="w-full overflow-hidden border border-gray-200 rounded-sm bg-white/75 shadow-sm dark:border-gray-700 dark:bg-gray-8/75"
+            >
               <div class="relative">
                 <a-carousel
                   :style="{
@@ -132,18 +140,15 @@ watchDebounced(
                     height: '220px',
                   }"
                   class="border-b-1px border-zinc-3 bg-slate-3 dark:border-zinc-8 dark:bg-dark-9 ![&_.arco-carousel-arrow>div]:bg-black/60"
-                  :auto-play="{ interval: 15000, hoverToPause: true }" indicator-type="dot"
-                  show-arrow="hover" animation-name="fade"
+                  :auto-play="{ interval: 15000, hoverToPause: true }" indicator-type="dot" show-arrow="hover"
+                  animation-name="fade"
                 >
                   <a-carousel-item v-for="(image, index) in hotelSliders" :key="index">
                     <div
                       class="h-full w-full flex items-center justify-center"
                       @click="$emit('showHotelImagesViewer', hotelDetails?.hotelCode)"
                     >
-                      <UseImage
-                        class="h-auto w-full"
-                        :src="image.image.screen"
-                      >
+                      <UseImage class="h-auto w-full" :src="image.image.screen">
                         <template #loading>
                           <a-spin />
                         </template>
@@ -164,7 +169,9 @@ watchDebounced(
                   <span class="i-carbon-image-copy mr-1 inline-block h-4 w-4 text-sm" />
                   {{ hotelDetails.hotel.media?.count }}
                 </div>
-                <div class="absolute right-1 top-auto z-2 flex items-center rounded-1 bg-light-1/75 p-1 lt-sm:bottom-1 md:top-1">
+                <div
+                  class="absolute right-1 top-auto z-2 flex items-center rounded-1 bg-light-1/75 p-1 lt-sm:bottom-1 md:top-1"
+                >
                   <UseImage
                     class="h-8 w-8 fill-current text-dark-6"
                     :src="`/img/hotels-brands/${hotelDetails.hotel.brand}.svg`"
@@ -190,21 +197,41 @@ watchDebounced(
                     Hôtel
                     <a-rate
                       v-model="hotelStars"
-                      class="mx-1 mt-3 h-4 min-w-20 !min-h-21px [&_.arco-icon]:h-1.2rem [&_.arco-icon]:w-1.2rem ![&_.arco-rate-character:not(:last-child)]:mr-2px" allow-half readonly
+                      class="mx-1 mt-3 h-4 min-w-20 !min-h-21px [&_.arco-icon]:h-1.2rem [&_.arco-icon]:w-1.2rem ![&_.arco-rate-character:not(:last-child)]:mr-2px"
+                      allow-half readonly
                     >
                       <template #character>
                         <span class="i-carbon-star-filled block h-4 w-4 text-sm" />
                       </template>
                     </a-rate>
                   </h5>
-                  <p :title="hotelDetails?.hotel?.description" class="mb-2 overflow-hidden truncate text-gray-700 font-normal dark:text-gray-400">
+                  <p
+                    :title="hotelDetails?.hotel?.description"
+                    class="mb-2 overflow-hidden truncate text-gray-700 font-normal dark:text-gray-400"
+                  >
                     {{ hotelDetails?.hotel?.description }}
                   </p>
                   <div class="flex border-t-1px border-bluegray-5/25 py-2 space-x-1">
-                    <img class="h-5 w-5" :src="`https://api.iconify.design/mingcute:fitness-line.svg?color=%23${isDark ? 'fff' : '000'}`" alt="">
-                    <img class="h-5 w-5" :src="`https://api.iconify.design/ph:swimming-pool-light.svg?color=%23${isDark ? 'fff' : '000'}`" alt="">
-                    <img class="h-5 w-5" :src="`https://api.iconify.design/ic:twotone-local-parking.svg?color=%23${isDark ? 'fff' : '000'}`" alt="">
-                    <img class="h-5 w-5" :src="`https://api.iconify.design/guidance:stroller-parking.svg?color=%23${isDark ? 'fff' : '000'}`" alt="">
+                    <img
+                      class="h-5 w-5"
+                      :src="`https://api.iconify.design/mingcute:fitness-line.svg?color=%23${isDark ? 'fff' : '000'}`"
+                      alt=""
+                    >
+                    <img
+                      class="h-5 w-5"
+                      :src="`https://api.iconify.design/ph:swimming-pool-light.svg?color=%23${isDark ? 'fff' : '000'}`"
+                      alt=""
+                    >
+                    <img
+                      class="h-5 w-5"
+                      :src="`https://api.iconify.design/ic:twotone-local-parking.svg?color=%23${isDark ? 'fff' : '000'}`"
+                      alt=""
+                    >
+                    <img
+                      class="h-5 w-5"
+                      :src="`https://api.iconify.design/guidance:stroller-parking.svg?color=%23${isDark ? 'fff' : '000'}`"
+                      alt=""
+                    >
                   </div>
                   <div class="mb-2 border-t-1px border-bluegray-5/25 py-3">
                     <div class="flex pb-1">
@@ -215,7 +242,8 @@ watchDebounced(
                         </span>
                         <span class="i-carbon-arrow-right mx-1 inline-block h-4 w-4 text-sm" />
                         <span>
-                          {{ dayjs(hotelDetails.offers[0].period?.dateIn).add(hotelDetails.offers[0].period?.nights - 1, 'day').format('DD MMMM YYYY') }}
+                          {{ dayjs(hotelDetails.offers[0].period?.dateIn).add(hotelDetails.offers[0].period?.nights - 1,
+                                                                              'day').format('DD MMMM YYYY') }}
                         </span>
                       </div>
                     </div>
@@ -235,11 +263,21 @@ watchDebounced(
                       <span class="block text-zinc-5">(frais et taxes inclus)</span>
                     </span>
 
-                    <span class="text-lg text-gray-900 font-light animated-repeat-1 animated-duration-0.5s lg:text-3xl dark:text-white" :class="[selectedTariffChanged && 'animated animate-bounce-in-down']">
-                      {{ (selectedRoomOffer?.offer?.pricing?.amount?.afterTax || 0).toLocaleString('fr-FR', { style: 'currency', currency: selectedRoomOffer?.offer?.pricing?.currency || 'EUR' }) }}
+                    <span
+                      class="text-lg text-gray-900 font-light animated-repeat-1 animated-duration-0.5s lg:text-3xl dark:text-white"
+                      :class="[selectedTariffChanged && 'animated animate-bounce-in-down']"
+                    >
+                      {{ (selectedRoomOffer?.offer?.pricing?.amount?.afterTax || 0).toLocaleString('fr-FR', {
+                        style:
+                          'currency',
+                        currency: selectedRoomOffer?.offer?.pricing?.currency || 'EUR',
+                      }) }}
                     </span>
                   </div>
-                  <a-button :disabled="!selectedRoomOffer" long type="primary" html-type="submit" class="group !h-10" size="large">
+                  <a-button
+                    :disabled="!selectedRoomOffer" long type="primary" html-type="submit" class="group !h-10"
+                    size="large"
+                  >
                     <span class="flex-1 text-lg">
                       Réservez
                     </span>
@@ -253,17 +291,28 @@ watchDebounced(
                 </div>
               </div>
             </div>
-            <h1 class="mb-4 hidden text-center text-2xl text-gray-900 font-extrabold lg:block lg:text-2xl xl:text-5xl dark:text-white">
-              <span class="from-sky-4 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent">Les bons plans</span> du moment.
+            <h1
+              class="mb-4 hidden text-center text-2xl text-gray-900 font-extrabold lg:block lg:text-2xl xl:text-5xl dark:text-white"
+            >
+              <span class="from-sky-4 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent">Les bons plans</span> du
+              moment.
             </h1>
           </div>
           <!-- list offers -->
           <div class="flex overflow-hidden lg:flex-row lg:pr-2">
             <div class="w-full flex flex-1">
               <div v-if="rooms && !loadingGetRooms && !errorGetRooms" class="w-full flex flex-col space-y-2">
-                <div v-for="(room, index) in rooms" :key="room.code" :class="[selectedRoomOffer?.roomCode === room.code ? 'border-blue-3 dark:border-blue-7 dark:bg-gray-8 bg-white' : 'border-gray-2 dark:border-gray-7 dark:bg-gray-8/65 bg-white/65']" class="border rounded-sm p-1 shadow-sm">
+                <div
+                  v-for="(room, index) in rooms" :key="room.code"
+                  :class="[selectedRoomOffer?.roomCode === room.code ? 'border-blue-3 dark:border-blue-7 dark:bg-gray-8 bg-white' : 'border-gray-2 dark:border-gray-7 dark:bg-gray-8/65 bg-white/65']"
+                  class="border rounded-sm p-1 shadow-sm"
+                >
                   <div class="min-h-35 flex flex-col overflow-hidden xl:flex-row">
-                    <img class="mr-2 h-full max-h-35 w-full rounded-2px object-cover md:h-auto xl:w-48" :src="`https://www.ahstatic.com/photos/${hotelDetails?.hotel?.id.toLowerCase()}_ro${room.code.toLowerCase()}_00_p_346x260.jpg`" alt="">
+                    <img
+                      class="mr-2 h-full max-h-35 w-full rounded-2px object-cover md:h-auto xl:w-48"
+                      :src="`https://www.ahstatic.com/photos/${hotelDetails?.hotel?.id.toLowerCase()}_ro${room.code.toLowerCase()}_00_p_346x260.jpg`"
+                      alt=""
+                    >
                     <div class="h-auto w-full flex flex-col justify-between">
                       <div class="">
                         <h5 class="my-1 text-xl text-gray-900 font-bold tracking-tight dark:text-white">
@@ -271,7 +320,10 @@ watchDebounced(
                         </h5>
                         <div>
                           <ul class="">
-                            <li v-for="amenitie in room.roomClass.amenities" :key="amenitie.name" class="flex items-center leading-5">
+                            <li
+                              v-for="amenitie in room.roomClass.amenities" :key="amenitie.name"
+                              class="flex items-center leading-5"
+                            >
                               <span class="i-carbon-checkmark mr-1 inline-block h-4 w-4" />
                               {{ amenitie.label }}
                             </li>
@@ -299,17 +351,28 @@ watchDebounced(
                           </h4>
                         </template>
                         <template v-if="room.offers[0]" #extra>
-                          <h5 class="md:text-md rounded-full bg-indigo-4/10 px-2.5 text-center text-sm text-gray-900 font-600 lg:block dark:bg-indigo-4/10 dark:text-white">
-                            <span class="from-sky-3 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent">From</span>
+                          <h5
+                            class="md:text-md rounded-full bg-indigo-4/10 px-2.5 text-center text-sm text-gray-900 font-600 lg:block dark:bg-indigo-4/10 dark:text-white"
+                          >
+                            <span
+                              class="from-sky-3 to-purple-4 bg-gradient-to-r bg-clip-text text-transparent"
+                            >From</span>
                             <span class="ml-1 font-500">
-                              {{ (room.offers[0]?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: room.offers[0]?.pricing?.currency || 'EUR' }) }}
+                              {{ (room.offers[0]?.pricing?.amount?.afterTax).toLocaleString('fr-FR', {
+                                style: 'currency',
+                                currency: room.offers[0]?.pricing?.currency || 'EUR',
+                              }) }}
                             </span>
                           </h5>
                         </template>
                         <div class="">
                           <a-radio-group v-model="selectedTariff" class="w-full flex flex-col space-y-2">
                             <template v-for="item in room.offers" :key="item.code">
-                              <a-radio class="w-full animated-repeat-1 animated-duration-200ms !mr-0 !pl-0" :value="`${room.code}_${item.code}`" :class="[selectedTariff === `${room.code}_${item.code}` && 'animated animate-pulse']">
+                              <a-radio
+                                class="w-full animated-repeat-1 animated-duration-200ms !mr-0 !pl-0"
+                                :value="`${room.code}_${item.code}`"
+                                :class="[selectedTariff === `${room.code}_${item.code}` && 'animated animate-pulse']"
+                              >
                                 <template #radio="{ checked }">
                                   <div
                                     class="custom-radio-card flex items-start"
@@ -327,7 +390,11 @@ watchDebounced(
                                       </a-typography-text>
                                       <div text-right>
                                         <span class="text-lg text-gray-900 font-light lg:text-xl dark:text-white">
-                                          {{ (item?.pricing?.amount?.afterTax).toLocaleString('fr-FR', { style: 'currency', currency: item?.pricing?.currency || 'EUR' }) }}
+                                          {{ (item?.pricing?.amount?.afterTax).toLocaleString('fr-FR', {
+                                            style:
+                                              'currency',
+                                            currency: item?.pricing?.currency || 'EUR',
+                                          }) }}
                                         </span>
                                       </div>
                                     </div>
@@ -360,7 +427,9 @@ watchDebounced(
       </div>
     </div>
     <template #fallback>
-      <div class="top-0 h-full flex items-center justify-center bg-light-1/90 backdrop-blur backdrop-filter dark:bg-dark-9/90">
+      <div
+        class="top-0 h-full flex items-center justify-center bg-light-1/90 backdrop-blur backdrop-filter dark:bg-dark-9/90"
+      >
         <a-spin />
       </div>
     </template>
@@ -402,7 +471,7 @@ watchDebounced(
 .custom-radio-card:hover,
 .custom-radio-card-checked,
 .custom-radio-card:hover .custom-radio-card-mask,
-.custom-radio-card-checked  .custom-radio-card-mask{
+.custom-radio-card-checked .custom-radio-card-mask {
   border-color: rgb(var(--primary-6));
 }
 

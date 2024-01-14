@@ -42,10 +42,7 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
         {{ item.hotel.media?.count }}
       </div>
       <div class="absolute right-1 top-auto flex items-center rounded-1 bg-light-1/75 p-1 lt-sm:bottom-1 md:top-1">
-        <UseImage
-          class="h-8 w-8 fill-current text-dark-6"
-          :src="`/img/hotels-brands/${item.hotel.brand}.svg`"
-        >
+        <UseImage class="h-8 w-8 fill-current text-dark-6" :src="`/img/hotels-brands/${item.hotel.brand}.svg`">
           <template #loading>
             Loading..
           </template>
@@ -61,10 +58,7 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
     <div class="flex flex-1 flex-col justify-between overflow-hidden">
       <div class="mb-1">
         <div class="flex justify-between">
-          <h4
-            :title="item.hotel.name"
-            class="flex-1 overflow-hidden truncate text-lg font-600 font-sans"
-          >
+          <h4 :title="item.hotel.name" class="flex-1 overflow-hidden truncate text-lg font-600 font-sans">
             {{ item.hotel.name }}
           </h4>
           <div class="flex-0 flex space-x-1">
@@ -77,17 +71,22 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
                 </a-button>
               </a-tooltip>
               <template #content>
-                <a-doption tabindex="0" @click="() => (selectedHotelId = item.hotel?.id, emit('centerPosition', item.hotel))">
+                <a-doption
+                  tabindex="0"
+                  @click="() => (selectedHotelId = item.hotel?.id, emit('centerPosition', item.hotel))"
+                >
                   Sélectionner on maps
                 </a-doption>
                 <a-doption
-                  tabindex="1"
-                  :disabled="selectedHotelId !== item.hotel?.id"
+                  tabindex="1" :disabled="selectedHotelId !== item.hotel?.id"
                   @click="() => (selectedHotelId === item.hotel?.id && (selectedHotelId = null, emit('closeInfoWindow')))"
                 >
                   Désélectionner
                 </a-doption>
-                <a-doption :disabled="item.status !== 'OPEN'" tabindex="0" @click="() => (selectedHotelId = item.hotel?.id, emit('toggleHotelDetails', true), emit('centerPosition', item.hotel))">
+                <a-doption
+                  :disabled="item.status !== 'OPEN'" tabindex="0"
+                  @click="() => (selectedHotelId = item.hotel?.id, emit('toggleHotelDetails', true), emit('centerPosition', item.hotel))"
+                >
                   Voir les chambres
                 </a-doption>
                 <a-doption>Save</a-doption>
@@ -121,15 +120,24 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
               <div class="">
                 <div class="relative flex items-center">
                   <div class="mt-1 flex items-center">
-                    <span v-for="s in new Array(5).fill(0).map((_, i) => ++i)" :key="s" class="relative mr-0.5 inline-block">
-                      <span :class="[s <= Number.parseFloat(item.hotel?.rating?.star?.score || 0) ? 'i-carbon-star-filled text-yellow-4' : 'i-carbon-star text-yellow-4/35']" class="block h-4 w-4 text-sm" />
+                    <span
+                      v-for="s in new Array(5).fill(0).map((_, i) => ++i)" :key="s"
+                      class="relative mr-0.5 inline-block"
+                    >
+                      <span
+                        :class="[s <= Number.parseFloat(item.hotel?.rating?.star?.score || 0) ? 'i-carbon-star-filled text-yellow-4' : 'i-carbon-star text-yellow-4/35']"
+                        class="block h-4 w-4 text-sm"
+                      />
                     </span>
                   </div>
                 </div>
               </div>
               <div v-if="item.hotel.rating?.trustyou?.score" class="my-1 flex">
                 <div class="mr-1 lt-sm:hidden">
-                  <a-progress :show-text="false" class="!w-21" status="success" :percent="+((((item.hotel?.rating?.trustyou?.score || 0) * 100) / 5)).toFixed() / 100" />
+                  <a-progress
+                    :show-text="false" class="!w-21" status="success"
+                    :percent="+((((item.hotel?.rating?.trustyou?.score || 0) * 100) / 5)).toFixed() / 100"
+                  />
                 </div>
                 <span font-semibold>{{ item.hotel.rating?.trustyou?.score || 0 }} / 5</span>
               </div>
@@ -137,8 +145,11 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
                 <span>{{ item.hotel.rating?.trustyou?.nbReviews || 0 }} reviews</span>
               </div>
             </div>
-            <h4 v-if="item.hotel.localization?.address?.street" class="flex-0 hidden items-center overflow-hidden pr-2 text-sm md:flex">
-              <span :title="item.hotel.localization?.address?.street" class="i-carbon-location flex-0 mr-1 h-4 w-4 text-sm" />
+            <h4
+              v-if="item.hotel.localization?.address?.street"
+              class="flex-0 hidden items-center overflow-hidden pr-2 text-sm md:flex"
+            >
+              <span :title="item.hotel.localization?.address?.street" class="i-carbon-location mr-1 h-4 w-4 text-sm" />
               <span class="overflow-hidden truncate">
                 {{ item.hotel.localization?.address?.street }}
               </span>
@@ -170,11 +181,11 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
               </div>
               <div v-if="item.offers?.length > 0" class="hidden md:flex space-x-2">
                 <h5 class="inline-block flex items-center text-sm">
-                  <span class="i-carbon-sunset flex-0 mr-0.5 h-4 w-4 text-sm" />
+                  <span class="i-carbon-sunset mr-0.5 h-4 w-4 text-sm" />
                   <span>{{ item.offers[0]?.period.nights }} nuits</span>
                 </h5>
                 <h5 class="inline-block flex items-center text-sm">
-                  <span class="flex-0 i-carbon-person mr-0.5 h-4 w-4 text-sm" />
+                  <span class="i-carbon-person mr-0.5 h-4 w-4 text-sm" />
                   <span>{{ item.offers[0].effectiveOccupancy?.adults }} adults</span>
                 </h5>
               </div>
@@ -192,10 +203,12 @@ const { hotelList, selectedHotelId } = useVModels(props, emit)
   animation-range: entry;
   animation-timeline: view(y);
 }
+
 @keyframes fadeIn {
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }

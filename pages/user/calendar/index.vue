@@ -59,11 +59,8 @@ const { data, error } = await useFetch('/api/google/calendars/primary/events')
 if (!error.value && data?.value?.length)
   events.value = data.value
 
-function eventChanged(event: any) {
-  if (!event)
-    return
-
-  console.log(event)
+function eventChanged() {
+  // console.log(event)
   // const id = event.id
   // const foundedEvent = mockedEvents.value.events.find((e: any) => e.id === id)
 

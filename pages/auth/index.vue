@@ -6,7 +6,6 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { message } = useMessage()
 const currentYear = useDateFormat(useNow(), 'YYYY')
 
 const loginLoading = ref(false)

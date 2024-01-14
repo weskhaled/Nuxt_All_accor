@@ -11,3 +11,20 @@ export const smAndSmaller = breakpoints.smallerOrEqual('sm')
 export const mdAndSmaller = breakpoints.smallerOrEqual('md')
 
 export const userLang = ref('fr-FR')
+
+export const floatMenuItems = ref([
+  {
+    key: '1',
+    icon: 'i-carbon-idea',
+    text: 'Ideas',
+    action: () => {
+    },
+  },
+  {
+    key: '2',
+    icon: 'i-carbon-debug',
+    text: 'Bugs',
+    action: () => {
+    },
+  },
+])

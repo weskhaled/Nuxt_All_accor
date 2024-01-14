@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { breakpointsTailwind } from '@vueuse/core'
-import { UseDraggable as Draggable } from '@vueuse/components'
-import { mdAndSmaller } from '~/common/stores/index'
+import { floatMenuItems, mdAndSmaller } from '~/common/stores/index'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,13 +9,11 @@ const supabaseClient = useSupabaseClient()
 const user = useSupabaseUser()
 const currentRoutePath = ref([route.path])
 // const { isFullscreen, toggle: toggleFullscreen } = useFullscreen()
-const { width: windowWidth, height: windowHeight } = useWindowSize()
 const breakpoints = useBreakpoints(breakpointsTailwind)
 const greaterOrEqualToMd = computed(() => breakpoints.greaterOrEqual('md'))
 const [showSidebarValue, showSidebarToggle] = useToggle()
 const popupFloatMenuVisible = ref(false)
 
-const handlePopupFloatMenu = ref<HTMLElement | null>(null)
 const layoutSiderRef = ref<HTMLElement | null>(null)
 const layoutMobileMenuRef = ref<HTMLElement | null>(null)
 
@@ -44,8 +41,10 @@ onClickOutside(layoutSiderRef, () => {
   >
     <ClientOnly>
       <a-layout-sider
-        ref="layoutSiderRef" hide-trigger collapsible :collapsed-width="60"
-        :theme="isDark ? 'dark' : 'light'" :collapsed="greaterOrEqualToMd.value === true" class="layout-sidebar"
+        ref="layoutSiderRef" hide-trigger collapsible
+        :collapsed-width="60"
+        :theme="isDark ? 'dark' : 'light'"
+        :collapsed="greaterOrEqualToMd.value === true" class="layout-sidebar"
         :class="[showSidebarValue ? 'lt-md:translate-x-0' : 'lt-md:translate-x-[-100%]']"
       >
         <a href="" class="relative my-3 flex" @click.prevent="async () => await $router.push('/')">
@@ -125,7 +124,7 @@ onClickOutside(layoutSiderRef, () => {
           </a-menu>
         </div>
         <div
-          class="flex-0 flex items-center lt-md:(w-full justify-center border-t border-light-1 bg-light-1/80 py-4 space-x-4 dark:border-dark-6 dark:bg-dark-8/80) md:flex-col md:pb-8 [&_.arco-btn>.arco-btn-icon>span]:text-dark md:space-y-4 dark:[&_.arco-btn>.arco-btn-icon>span]:text-light"
+          class="flex-0 flex items-center lt-md:(w-full justify-center border-t border-light-1 bg-light-1/80 py-3 space-x-2 dark:border-dark-6 dark:bg-dark-8/80) md:flex-col md:pb-8 [&_.arco-btn>.arco-btn-icon>span]:text-dark md:space-y-4 dark:[&_.arco-btn>.arco-btn-icon>span]:text-light"
         >
           <a-dropdown v-if="user">
             <a-button shape="circle" class="h-full flex items-center justify-center" type="text">
@@ -188,10 +187,12 @@ onClickOutside(layoutSiderRef, () => {
       </a-layout-sider>
     </ClientOnly>
     <a-layout class="ml-0 flex flex-col transition-margin">
-      <a-layout-content id="layoutMain" class="relative overflow-hidden">
+      <a-layout-content id="layoutMain" class="relative perspective-1000px overflow-hidden">
         <Suspense>
           <!-- loading state via #fallback slot -->
-          <slot />
+          <div class="h-full w-full transition-all">
+            <slot />
+          </div>
           <template #fallback>
             <div
               class="top-0 h-full flex items-center justify-center bg-light-1/90 backdrop-blur backdrop-filter dark:bg-dark-9/90"
@@ -256,53 +257,17 @@ onClickOutside(layoutSiderRef, () => {
       </ClientOnly>
     </a-layout>
     <ClientOnly>
-      <Draggable
-        storage-key="vueuse-draggable" storage-type="session" class="fixed z-1001"
-        :initial-value="{ x: windowWidth - 150, y: windowHeight - 150 }" :prevent-default="true"
-      >
-        <div ref="handlePopupFloatMenu">
-          <span
-            class="absolute left--5px top--5px z-102 h-5 w-5 flex cursor-grab items-center justify-center rounded-full bg-blue-700 text-10px text-light-50 active:cursor-grabbing"
-          >
-            <IconDragArrow />
-          </span>
-        </div>
-        <a-trigger
-          v-model:popupFloatMenuVisible="popupFloatMenuVisible" :trigger="[mdAndSmaller ? 'click' : 'hover']"
-          position="top" class="cursor-grab !dark:[&_.arco-menu-item]:bg-dark-9"
-        >
-          <div :class="`button-trigger ${popupFloatMenuVisible ? 'button-trigger-active' : ''}`">
-            <span v-if="popupFloatMenuVisible" i-carbon-close />
-            <span v-else i-carbon-overflow-menu-vertical />
-          </div>
-          <template #content>
-            <a-menu
-              :style="{ marginBottom: '-2px' }" mode="popButton" :tooltip-props="{ mini: true, position: 'left' }"
-              show-collapse-button
-            >
-              <a-menu-item key="1">
-                <template #icon>
-                  <IconBug />
-                </template>
-                Bugs
-              </a-menu-item>
-              <a-menu-item key="2">
-                <template #icon>
-                  <IconBulb />
-                </template>
-                Ideas
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-trigger>
-      </Draggable>
+      <CommonDraggableFloatMenu
+        v-model="popupFloatMenuVisible"
+        :menu-items="floatMenuItems"
+      />
     </ClientOnly>
   </a-layout>
 </template>
 
 <style lang="less">
 .layout-sidebar {
-  @apply border-r-1px border-stone-2 z-20 md:block dark:border-stone-9 transition-all !lt-md:h-[calc(100%-2.9rem)];
+  @apply border-r-1px border-stone-2 z-20 md:block dark:border-stone-9 transition-all !lt-md:h-[calc(100%-2.875rem)];
 
   @apply bg-white/85 dark:bg-black/85;
 
@@ -332,9 +297,10 @@ onClickOutside(layoutSiderRef, () => {
 
 .wrapper-layout {
   .arco-layout-content {
+    @apply transition-all;
 
     &::before {
-      @apply pointer-events-none absolute right-0 top-0 z-10 h-full w-full bg-black/0 transition-all content-[''];
+      @apply pointer-events-none absolute right-0 top-0 z-120 h-full w-full bg-black/0 transition-all content-[''];
     }
   }
 

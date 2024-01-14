@@ -38,7 +38,7 @@ const optionsPlaces = ref([])
 const loadingPlaces = ref(false)
 const layoutView = ref('MAP')
 const viewInMap = ref(true)
-// const showHotelDetails = ref(false)
+
 const visibleDrawer = ref(false)
 const visibleImgViewer = ref(false)
 const loadingHotelImages: Ref<string | null> = ref(null)
@@ -241,6 +241,9 @@ watchOnce(() => googleMapsApi.value, () => {
   latlngbounds = new googleMapsCoreApi.value.LatLngBounds()
 })
 
+watch(coords, (val) => {
+  console.log(val)
+})
 watch(() => selectedHotelIndex.value, async (value) => {
   if (!value || value < 0)
     return
@@ -336,8 +339,6 @@ watchDebounced(
       dateToRouteQuery.value = dayjs(filters.date[1]).format('YYYY-MM-DD')
       const nights = dayjs(filters.date[1]).diff(filters.date[0], 'day') + 1
       nightsRouteQuery.value = `${nights}`
-
-      // compositionsRouteQuery.value = `{}`
     }
   },
   { debounce: 0, maxWait: 1000 },
@@ -427,8 +428,8 @@ onMounted(async () => {
                   </span>
                 </h1>
                 <div class="max-w-65 flex items-center md:w-3/8 space-x-1">
-                  <a-button type="secondary" long class="group !pl-0 !font-semibold" size="medium" status="success">
-                    <span class="hidden flex-1 lg:flex lg:px-2">
+                  <a-button type="secondary" long class="group font-semibold !pl-0" size="medium" status="success">
+                    <span class="hidden flex-1 md:block lg:px-2">
                       Share
                     </span>
                     <span
@@ -437,7 +438,7 @@ onMounted(async () => {
                       <span class="h-4 w-4 transition-all group-hover:scale-110%" i-carbon-share />
                     </span>
                   </a-button>
-                  <a-button type="secondary" class="group !pl-0 !font-semibold" size="medium" status="danger">
+                  <a-button type="secondary" class="group font-semibold !pl-0" size="medium" status="danger">
                     <span class="hidden flex-1 lg:flex lg:px-2">
                       Save Search
                     </span>
@@ -478,7 +479,7 @@ onMounted(async () => {
                   </div>
                 </div>
               </div>
-              <div class="z-6 h-14 flex items-center justify-between py-2 space-x-2">
+              <div class="z-6 h-14 flex items-center justify-between space-x-2">
                 <div class="relative h-full flex flex-1 overflow-hidden space-x-2">
                   <h3
                     class="flex flex-1 items-center overflow-hidden truncate opacity-100 transition-all delay-0.2s"
@@ -504,7 +505,7 @@ onMounted(async () => {
                       {{ destinationRouteQuery }}
                     </span>
                   </h3>
-                  <div class="hidden items-center md:flex !md:w-65 !xl:w-122.5">
+                  <div class="hidden items-center md:flex !md:w-65">
                     <a-input-search
                       v-model="filters.searchInput" allow-clear search-button class="w-full"
                       placeholder="Please enter something"

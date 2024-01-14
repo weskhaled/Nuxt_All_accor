@@ -1,8 +1,8 @@
 import process from 'node:process'
-import { createResolver } from 'nuxt/kit'
 import { vitePluginForArco } from '@arco-plugins/vite-vue'
 import { appDescription } from './constants/index'
 
+// import { createResolver } from 'nuxt/kit'
 import { pwa } from './config/pwa'
 
 // const { resolve } = createResolver(import.meta.url)

@@ -42,10 +42,10 @@ function handleSubmit({ values, errors }) {
 
 <template>
   <div
-    class="relative z-2 ml-0 max-w-xl w-full border border-zinc-5/10 rounded-2px bg-white/80 p-5 shadow-black/3 shadow-sm backdrop-blur md:mt-7 dark:bg-black/80"
+    class="relative z-2 ml-0 w-full w-full border border-zinc-5/40 rounded-2px bg-white/80 p-5 shadow-black/3 shadow-sm backdrop-blur lg:(mb-12 self-end) dark:bg-black/80"
   >
-    <a-form ref="formRef" class="[&_.arco-form-item-layout-vertical>.arco-form-item-label-col]:mb-0.5 [&_.arco-form-item]:mb-1 ![&_.arco-form-item-label-col>.arco-form-item-label]:(text-sm/8 font-500)" layout="vertical" size="large" :model="filters" @submit="handleSubmit">
-      <div class="md:mt-2">
+    <a-form ref="formRef" class="flex flex-col text-4.2 font-500 [&_.arco-form-item-layout-vertical>.arco-form-item-label-col]:mb-0.5 [&_.arco-form-item]:mb-1 !lg:(w-full flex-row space-x-2) ![&_.arco-form-item-label-col>.arco-form-item-label]:(text-sm/8 font-500)" layout="vertical" size="large" :model="filters" @submit="handleSubmit">
+      <div class="md:mt-2 lg:w-1/3">
         <a-form-item field="destination" label="Destination" :rules="[{ required: true, message: 'destination is required' }]">
           <a-auto-complete
             v-model="filters.destination"
@@ -67,7 +67,7 @@ function handleSubmit({ values, errors }) {
           />
         </a-form-item>
       </div>
-      <div class="mt-2">
+      <div class="mt-2 lg:w-1/3">
         <div class="w-full flex flex-col">
           <div class="hidden flex-1 md:flex">
             <a-form-item field="date" label="From To" :rules="[{ required: true, message: 'date is required' }]">
@@ -124,11 +124,11 @@ function handleSubmit({ values, errors }) {
           </div>
         </div>
       </div>
-      <div class="md:mt-2">
+      <div class="md:mt-2 lg:w-1/3">
         <a-form-item field="compositions" label="Sélectionnez vos voyageurs" :rules="[{ required: true, message: 'Sélectionnez vos voyageurs' }]">
           <a-trigger trigger="click" show-arrow scroll-to-close @popup-visible-change="(visible) => emit('popupVisibleChange', visible)">
             <a-button class="w-full">
-              <span class="text-4.2 font-500">
+              <span class="text-4.2 font-400">
                 <span class="hidden md:inline-block">
                   Chambre pour
                 </span>
@@ -161,24 +161,23 @@ function handleSubmit({ values, errors }) {
           </a-trigger>
         </a-form-item>
       </div>
-      <div class="flex-0">
-        <div class="mt-2 w-full md:absolute md:right--6 md:top--6 md:w-60">
-          <a-button type="primary" html-type="submit" class="group !h-9 !w-full" size="large">
-            <span class="flex-1 text-4.2 font-500">
-              Recherche
-            </span>
-            <span
-              flex-0 h-full w-20 flex items-center justify-center rounded-r-2px
-              class="ml-2 bg-blue-9/20 px-2 -mr-[calc(1.25rem-1px)]"
-            >
-              <span class="h-5 w-5 transition-all group-hover:scale-115%" i-carbon-search />
-            </span>
-          </a-button>
-        </div>
+
+      <div class="flex-0 mt-2 w-full md:absolute md:bottom--4 md:right--4 md:w-60">
+        <a-button type="primary" html-type="submit" class="group !h-9 !w-full" size="large">
+          <span class="flex-1 text-4.2 font-500">
+            Recherche
+          </span>
+          <span
+            flex-0 h-full w-20 flex items-center justify-center rounded-r-2px
+            class="ml-2 bg-blue-9/20 px-2 -mr-[calc(1.25rem-1px)]"
+          >
+            <span class="h-5 w-5 transition-all group-hover:scale-115%" i-carbon-search />
+          </span>
+        </a-button>
       </div>
     </a-form>
     <div class="pt-3">
-      <a href="javascript:;" class="text-3.8 font-medium font-general text-blue-8 dark:text-blue-1" @click="$router.push('/search')">Ma dernière recherche</a>
+      <a href="javascript:;" class="text-3.8 text-blue-8 font-medium font-general dark:text-blue-1" @click="$router.push('/search')">Ma dernière recherche</a>
     </div>
   </div>
 </template>
