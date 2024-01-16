@@ -37,7 +37,7 @@ const keySort = ref([
 const optionsPlaces = ref([])
 const loadingPlaces = ref(false)
 const layoutView = ref('MAP')
-const viewInMap = ref(true)
+const viewInMap = ref(false)
 
 const visibleDrawer = ref(false)
 const visibleImgViewer = ref(false)

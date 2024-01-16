@@ -190,7 +190,7 @@ onClickOutside(layoutSiderRef, () => {
       <a-layout-content id="layoutMain" class="relative perspective-1000px overflow-hidden">
         <Suspense>
           <!-- loading state via #fallback slot -->
-          <div class="h-full w-full transition-all">
+          <div class="h-full w-full transition-all-0">
             <slot />
           </div>
           <template #fallback>

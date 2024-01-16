@@ -103,6 +103,7 @@ async function okDrawerHandler() {
   await promiseTimeout(100)
   selectedEvent.value = null
 }
+
 watch(() => selectedEvent.value, (event) => {
   if (!event)
     return
@@ -134,7 +135,7 @@ watch(() => selectedEvent.value, (event) => {
           }))" title="Event Info" layout="inline-vertical" bordered
         />
       </div>
-      <div class="flex-none border-t border-stone-2 p-2 text-right space-x-1 dark:border-stone-9">
+      <div class="flex flex-none items-center justify-end border-t border-stone-2 p-2 text-right space-x-1 dark:border-stone-9">
         <a-button class="custom-shadow !font-semibold" type="primary" status="danger" size="small" @click="visibleDrawer = false">
           Close
         </a-button>
