@@ -11,7 +11,7 @@ defineProps<{
         <slot name="aside" />
       </aside>
 
-      <main class="z-1 h-inherit w-full flex-1 flex-col overflow-hidden overflow-y-auto bg-white/45 lt-md:absolute dark:bg-black/45 !md:relative !md:flex">
+      <main class="z-1 h-inherit w-full flex-1 flex-col overflow-hidden overflow-y-auto bg-[url(https://volta.net/home/cta.png)] bg-white/15 bg-cover bg-no-repeat dark:bg-black/45 !md:relative !md:flex">
         <slot name="main-header" />
         <div class="flex-1">
           <div class="pointer-events-none absolute inset-x-0 top-0 z-2 flex justify-center overflow-hidden">

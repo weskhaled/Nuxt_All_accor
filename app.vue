@@ -19,11 +19,13 @@ useHead({
 
 <template>
   <VitePwaManifest />
-  <NuxtLayout>
-    <a-config-provider :locale="localeProvider">
-      <NuxtPage />
-    </a-config-provider>
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <a-config-provider :locale="localeProvider">
+        <NuxtPage />
+      </a-config-provider>
+    </NuxtLayout>
+  </div>
 </template>
 
 <style scoped lang="less">

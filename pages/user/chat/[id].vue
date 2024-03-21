@@ -1,11 +1,21 @@
 <script setup lang="ts">
+import { useRouteParams } from '@vueuse/router'
+
 definePageMeta({
   layout: 'main',
 })
+const chatId = useRouteParams('id')
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div v-if="chatId === 'new'" class="h-full flex flex-col items-center justify-center p-3">
+    <!-- new chat  -->
+    <h3 class="mb-1 text-lg font-semibold">
+      New chat
+    </h3>
+    <a-input-search size="large" class="max-w-60" placeholder="Search" />
+  </div>
+  <div v-else class="flex flex-col">
     <div class="flex gap-3 px-3 py-5">
       <div class="shrink-0 rounded-full size-45px">
         <img src="https://flowbite.com/docs/images/people/profile-picture-2.jpg" class="h-full w-full rounded-full object-cover" alt="">
